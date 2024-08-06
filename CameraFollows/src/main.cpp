@@ -1,16 +1,13 @@
+#include <spdlog/sinks/basic_file_sink.h>
+#include <spdlog/sinks/msvc_sink.h>
+
 #include "hpp/console.hpp"
 
-std::filesystem::path LogPath() {
-	auto relPath = std::filesystem::path("Data\\SKSE\\Plugins");
-	auto absPath = std::filesystem::absolute(relPath);
-	return absPath;
-}
-
 void InitLogging() {
-	std::optional<std::filesystem::path> path = LogPath();
+	auto path = logs::log_directory();
 	if (!path) return;
 	const auto plugin = SKSE::PluginDeclaration::GetSingleton();
-	*path /= fmt::format("{}.log", plugin->GetName());
+	*path /= std::format("{}.log", plugin->GetName());
 	std::vector<spdlog::sink_ptr> sinks{ 
 		std::make_shared<spdlog::sinks::basic_file_sink_mt>(path->string(), true), 
 		std::make_shared<spdlog::sinks::msvc_sink_mt>() 

@@ -30,7 +30,7 @@ namespace CamFolUtility {
 	void ReadConfig(const SKSE::PluginDeclaration* plugin) {
 		std::string data = "";
 		std::string result = "";
-		std::string path = fmt::format("Data\\SKSE\\Plugins\\{}.ini", plugin->GetName());
+		std::string path = std::format("Data\\SKSE\\Plugins\\{}.ini", plugin->GetName());
 
 		// read from ini
 		mINI::INIFile file(path);
@@ -43,24 +43,31 @@ namespace CamFolUtility {
 
 			// sTransformNode
 			data = ini.get("General").get("sTransformNode");
-			if (data.length() > 0) result = fmt::format("CamFol.Success >> {}", data);
+			if (data.length() > 0) result = std::format("CamFol.Success >> {}", data);
 			else {
 				data = "NPC Root [Root]";
-				result = fmt::format("CamFol.Error >> {}", data);
+				result = std::format("CamFol.Error >> {}", data);
 			}
 			TransformNode = data;
 			logs::info("Config.General.sTransformNode = {}", result);
 
 			// sConsoleCommand
 			data = ini.get("General").get("sConsoleCommand");
-			if (data.length() > 0) result = fmt::format("CamFol.Success >> {}", data);
+			if (data.length() > 0) result = std::format("CamFol.Success >> {}", data);
 			else {
 				data = "TestFadeNodes";
-				result = fmt::format("CamFol.Error >> {}", data);
+				result = std::format("CamFol.Error >> {}", data);
 			}
 			ConsoleCommand = data;
 			logs::info("Config.General.sConsoleCommand = {}", result);
 		}
+	}
+
+	template<typename T>
+	T* GetMember(void* base, std::ptrdiff_t offset) {
+		auto address = std::uintptr_t(base) + offset;
+		auto reloc = REL::Relocation<T*>(address);
+		return reloc.get();
 	}
 
 	bool IsInFirstPerson(RE::PlayerCamera* camera) {
@@ -77,9 +84,10 @@ namespace CamFolUtility {
 		if (ProcessEnabled) {
 			bool a = IsInFirstPerson(camera);
 			bool b = *controls & (int)RE::ControlMap::UEFlag::kMovement;
-			bool c = userInterface->IsMenuOpen(RE::MapMenu::MENU_NAME) == false;
-			bool d = player->GetOccupiedFurniture().get() == nullptr;
-			return (a && b && c && d);
+			bool c = !userInterface->IsMenuOpen(RE::MapMenu::MENU_NAME);
+			bool d = !player->GetOccupiedFurniture().get().get();
+			bool e = !player->IsInKillMove();
+			return (a && b && c && d && e);
 		}
 		return false;
 	}
