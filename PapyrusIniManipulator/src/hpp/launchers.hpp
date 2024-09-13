@@ -6,15 +6,14 @@
 namespace PIMLaunchers {
 
 	void InitLogging() {
-		std::optional<fs::path> path = PIMUtility::PluginLogPath();
-		if (!path) return;
+		auto path = PIMUtility::PluginLogPath();
 		const auto plugin = SKSE::PluginDeclaration::GetSingleton();
-		*path /= fmt::format("{}.log", plugin->GetName());
+		path /= std::format("{}.log", plugin->GetName());
 		std::shared_ptr<spdlog::sinks::sink> sink;
 		if (WinAPI::IsDebuggerPresent()) {
 			sink = std::make_shared<spdlog::sinks::msvc_sink_mt>();
 		} else {
-			sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(path->string(), true);
+			sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(path.string(), true);
 		}
 		auto logger = std::make_shared<spdlog::logger>("global", sink);
 		logger->set_level(spdlog::level::info);

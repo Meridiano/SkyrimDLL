@@ -4,7 +4,7 @@ namespace PIMUtility {
 	
 	std::string PluginConfigPath() {
 		const auto plugin = SKSE::PluginDeclaration::GetSingleton();
-		return fmt::format("Data\\SKSE\\Plugins\\{}.ini", plugin->GetName());
+		return std::format("Data\\SKSE\\Plugins\\{}.ini", plugin->GetName());
 	}
 
 	fs::path PluginLogPath() {

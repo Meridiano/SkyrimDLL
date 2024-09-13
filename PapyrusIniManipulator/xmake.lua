@@ -1,21 +1,17 @@
 -- set minimum xmake version
-set_xmakever("2.7.8")
+set_xmakever("2.8.2")
+
+-- includes
+includes("lib/commonlibsse-ng")
 
 -- set project
 set_project("PapyrusIniManipulator")
-set_version("1.9.6")
-set_license("MIT License")
-set_languages("c++20")
-set_optimize("faster")
--- disable warnings
--- set_warnings("allextra", "error")
-
--- set allowed
-set_allowedarchs("windows|x64")
-set_allowedmodes("debug", "releasedbg")
+set_version("1.9.7")
+set_license("MIT")
 
 -- set defaults
-set_defaultarchs("windows|x64")
+set_languages("c++23")
+set_warnings("allextra")
 set_defaultmode("releasedbg")
 
 -- add rules
@@ -25,16 +21,16 @@ add_rules("plugin.vsxmake.autoupdate")
 -- set policies
 set_policy("package.requires_lock", true)
 
--- require packages
-add_requires("commonlibsse-ng", { configs = { skyrim_vr = true } })
+-- set configs
+set_config("skyrim_vr", true)
 
 -- targets
 target("PapyrusIniManipulator")
-    -- add packages to target
-    add_packages("fmt", "spdlog", "commonlibsse-ng")
+    -- add dependencies to target
+    add_deps("commonlibsse-ng")
 
     -- add commonlibsse-ng plugin
-    add_rules("@commonlibsse-ng/plugin", {
+    add_rules("commonlibsse-ng.plugin", {
         name = "PapyrusIniManipulator",
         author = "Meridiano",
         description = "SKSE64 plugin to r/w ini-files using Papyrus"
@@ -46,7 +42,7 @@ target("PapyrusIniManipulator")
     add_includedirs("src")
     set_pcxxheader("src/pch.h")
 
-    -- copy build files to MODS or SKYRIM paths
+    -- copy build files to MODS or GAME paths (remove this if not needed)
     after_build(function(target)
         local copy = function(env, ext)
             for _, env in pairs(env:split(";")) do
@@ -58,9 +54,9 @@ target("PapyrusIniManipulator")
                 end
             end
         end
-        if os.getenv("SKYRIM_MODS_PATH") then
-            copy(os.getenv("SKYRIM_MODS_PATH"), target:name())
-        elseif os.getenv("SKYRIM_PATH") then
-            copy(os.getenv("SKYRIM_PATH"), "Data")
+        if os.getenv("XSE_TES5_MODS_PATH") then
+            copy(os.getenv("XSE_TES5_MODS_PATH"), target:name())
+        elseif os.getenv("XSE_TES5_GAME_PATH") then
+            copy(os.getenv("XSE_TES5_GAME_PATH"), "Data")
         end
     end)
