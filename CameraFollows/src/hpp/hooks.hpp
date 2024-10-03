@@ -8,6 +8,7 @@ namespace CamFolHooks {
 	std::uint32_t* pControls = nullptr;
 	RE::UI* pUserInterface = nullptr;
 	RE::PlayerCharacter* pPlayer = nullptr;
+	RE::VATS* pVATS = nullptr;
 
 	class UpdatePCHook {
 	public:
@@ -25,7 +26,7 @@ namespace CamFolHooks {
 			UpdatePC(pc, delta);
 
 			// do my stuff
-			if (CamFolUtility::ProcessConditions(pCamera, pControls, pUserInterface, pPlayer)) CamFolUtility::UpdateCamera(pCamera, pPlayer);
+			if (CamFolUtility::ProcessConditions(pCamera, pControls, pUserInterface, pPlayer, pVATS)) CamFolUtility::UpdateCamera(pCamera, pPlayer);
 		}
 		static inline REL::Relocation<decltype(UpdatePCMod)> UpdatePC;
 	};
@@ -39,14 +40,16 @@ namespace CamFolHooks {
 
 		pUserInterface = RE::UI::GetSingleton();
 		pPlayer = RE::PlayerCharacter::GetSingleton();
+		pVATS = RE::VATS::GetSingleton();
 
 		// log pointers
 		logs::info(
-			"Camera = {:X}, Controls = {:X} (Post-1130 {}), UserInterface = {:X}, Player = {:X}",
+			"Camera = {:X}, Controls = {:X} (Post-1130 {}), UserInterface = {:X}, Player = {:X}, VATS = {:X}",
 			(std::uint64_t)pCamera,
 			(std::uint64_t)pControls, post1130 ? "Enabled" : "Disabled",
 			(std::uint64_t)pUserInterface,
-			(std::uint64_t)pPlayer
+			(std::uint64_t)pPlayer,
+			(std::uint64_t)pVATS
 		);
 	}
 
