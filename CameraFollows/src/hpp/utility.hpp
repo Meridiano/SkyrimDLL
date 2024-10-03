@@ -80,14 +80,15 @@ namespace CamFolUtility {
 		return (value != 0.0);
 	}
 
-	bool ProcessConditions(RE::PlayerCamera* camera, std::uint32_t* controls, RE::UI* userInterface, RE::PlayerCharacter* player) {
+	bool ProcessConditions(RE::PlayerCamera* camera, std::uint32_t* controls, RE::UI* userInterface, RE::PlayerCharacter* player, RE::VATS* vats) {
 		if (ProcessEnabled) {
 			bool a = IsInFirstPerson(camera);
-			bool b = *controls & (int)RE::ControlMap::UEFlag::kMovement;
+			bool b = (*controls & (int)RE::ControlMap::UEFlag::kMovement);
 			bool c = !userInterface->IsMenuOpen(RE::MapMenu::MENU_NAME);
 			bool d = !player->GetOccupiedFurniture().get().get();
 			bool e = !player->IsInKillMove();
-			return (a && b && c && d && e);
+			bool f = (vats->VATSMode != RE::VATS::VATS_MODE::kKillCam);
+			return (a && b && c && d && e && f);
 		}
 		return false;
 	}

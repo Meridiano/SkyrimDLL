@@ -6,7 +6,7 @@ includes("lib/commonlibsse-ng")
 
 -- set project
 set_project("CameraFollows")
-set_version("1.5.6")
+set_version("1.5.7")
 set_license("MIT")
 
 -- set defaults
