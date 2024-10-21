@@ -5,8 +5,7 @@
 namespace SREPapyrus {
 	
 	std::string GetVersion(RE::StaticFunctionTag* base) {
-		const auto plugin = SKSE::PluginDeclaration::GetSingleton();
-		return plugin->GetVersion().string();
+		return SKSE::GetPluginVersion().string("-");
 	}
 
 	bool IsMatching(RE::StaticFunctionTag* base, std::string input, std::string filename, std::int32_t lineP, std::int32_t lineMA, std::int32_t lineMB) {
@@ -64,8 +63,7 @@ namespace SREPapyrus {
 	}
 
 	bool Register(RE::BSScript::IVirtualMachine* a_vm) {
-		const auto plugin = SKSE::PluginDeclaration::GetSingleton();
-		std::string className = plugin->GetName().data();
+		auto className = SKSE::GetPluginName();
 
 		// general
 		a_vm->RegisterFunction("GetVersion", className, GetVersion);

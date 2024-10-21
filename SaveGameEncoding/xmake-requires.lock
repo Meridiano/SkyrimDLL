@@ -6,42 +6,42 @@
         ["cmake#31fecfc4"] = {
             repo = {
                 branch = "master",
-                commit = "716e14d990780742fff408e84f2a738d78a802e9",
+                commit = "d885463d7cea3253b436ded2f4f17fd8423c4eaa",
                 url = "https://github.com/xmake-io/xmake-repo.git"
             },
-            version = "3.28.3"
+            version = "3.30.0"
         },
-        ["commonlibsse-ng#dc79ba23"] = {
+        ["directxmath#31fecfc4"] = {
             repo = {
                 branch = "master",
-                commit = "716e14d990780742fff408e84f2a738d78a802e9",
-                url = "https://github.com/xmake-io/xmake-repo.git"
+                commit = "0a03ba929e549ea94ca20e7579f288fc0b0d801a",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
             },
-            version = "v3.7.0"
+            version = "2024.02"
         },
-        ["fmt#31fecfc4"] = {
+        ["directxtk#31fecfc4"] = {
             repo = {
                 branch = "master",
-                commit = "716e14d990780742fff408e84f2a738d78a802e9",
-                url = "https://github.com/xmake-io/xmake-repo.git"
+                commit = "0a03ba929e549ea94ca20e7579f288fc0b0d801a",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
             },
-            version = "10.0.0"
+            version = "24.2.0"
         },
         ["rapidcsv#31fecfc4"] = {
             repo = {
                 branch = "master",
-                commit = "716e14d990780742fff408e84f2a738d78a802e9",
+                commit = "1f2721567c9678ec2bfb5bad9067b58379ed5ff0",
                 url = "https://github.com/xmake-io/xmake-repo.git"
             },
-            version = "8.50"
+            version = "8.84"
         },
-        ["spdlog#b06e1130"] = {
+        ["spdlog#9c36f0a9"] = {
             repo = {
                 branch = "master",
-                commit = "716e14d990780742fff408e84f2a738d78a802e9",
+                commit = "d885463d7cea3253b436ded2f4f17fd8423c4eaa",
                 url = "https://github.com/xmake-io/xmake-repo.git"
             },
-            version = "v1.11.0"
+            version = "v1.13.0"
         }
     }
 }

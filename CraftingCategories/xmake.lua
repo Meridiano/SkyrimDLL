@@ -1,66 +1,47 @@
--- minimum xmake version
-set_xmakever("2.7.8")
+-- set minimum xmake version
+set_xmakever("2.8.2")
 
--- project
+-- includes
+includes("lib/commonlibsse-ng")
+
+-- set project
 set_project("CraftingCategories")
 set_version("1.1.1")
-set_license("MIT License")
-set_languages("c++20")
-set_optimize("faster")
+set_license("MIT")
 
--- errors
-set_warnings("allextra", "error")
-set_exceptions("cxx")
+-- set defaults
+set_languages("c++23")
+set_warnings("allextra")
 
--- allowed
-set_allowedarchs("windows|x64")
-set_allowedmodes("debug", "releasedbg")
-
--- default
-set_defaultarchs("windows|x64")
-set_defaultmode("releasedbg")
-
--- rules
+-- add rules
 add_rules("mode.debug", "mode.releasedbg")
 add_rules("plugin.vsxmake.autoupdate")
 
--- policies
+-- set policies
 set_policy("package.requires_lock", true)
 
--- packages
-add_requires("fmt 10.2.1", "spdlog 1.13.0", "jsoncpp")
-add_requires("commonlibsse-ng", { configs = { skyrim_vr = true }})
+-- add libs
+add_requires("jsoncpp")
+
+-- set configs
+set_config("skyrim_vr", true)
+set_config("mode", "releasedbg")
 
 -- targets
 target("CraftingCategories")
-    add_packages("fmt", "spdlog", "jsoncpp", "commonlibsse-ng")
+    -- add dependencies to target
+    add_deps("commonlibsse-ng")
+    add_packages("jsoncpp")
 
-    add_rules("@commonlibsse-ng/plugin", {
+    -- add commonlibsse-ng plugin
+    add_rules("commonlibsse-ng.plugin", {
         name = "CraftingCategories",
         author = "Parapets & Meridiano",
         description = "NG patch for Constructible Object Custom Keyword System"
     })
 
+    -- add src files
     add_files("src/**.cpp")
     add_headerfiles("src/**.h")
     add_includedirs("src")
     set_pcxxheader("src/pch.h")
-
-    -- copy build files
-    after_build(function(target)
-        local copy = function(env, ext)
-            for _, env in pairs(env:split(";")) do
-                if os.exists(env) then
-                    local plugins = path.join(env, ext, "SKSE/Plugins")
-                    os.mkdir(plugins)
-                    os.trycp(target:targetfile(), plugins)
-                    os.trycp(target:symbolfile(), plugins)
-                end
-            end
-        end
-        if os.getenv("SKYRIM_MODS_PATH") then
-            copy(os.getenv("SKYRIM_MODS_PATH"), target:name())
-        elseif os.getenv("SKYRIM_PATH") then
-            copy(os.getenv("SKYRIM_PATH"), "Data")
-        end
-    end)

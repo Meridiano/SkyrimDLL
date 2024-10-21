@@ -1,27 +1,9 @@
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/msvc_sink.h>
 
-std::filesystem::path LogPath() {
-	auto relPath = std::filesystem::path("Data\\SKSE\\Plugins");
-	auto absPath = std::filesystem::absolute(relPath);
-	return absPath;
-}
-
-void InitLogging()
-{
-	std::optional<std::filesystem::path> path = LogPath();
-	if (!path) return;
-	const auto plugin = SKSE::PluginDeclaration::GetSingleton();
-	*path /= fmt::format("{}.log", plugin->GetName());
-	std::vector<spdlog::sink_ptr> sinks{
-		std::make_shared<spdlog::sinks::basic_file_sink_mt>(path->string(), true), 
-		std::make_shared<spdlog::sinks::msvc_sink_mt>() 
-	};
-	auto logger = std::make_shared<spdlog::logger>("global", sinks.begin(), sinks.end());
-	logger->set_level(spdlog::level::info);
-	logger->flush_on(spdlog::level::info);
-	spdlog::set_default_logger(std::move(logger));
-	spdlog::set_pattern("%d.%m.%Y %H:%M:%S [%s:%#] %v");
+void InitLogging(std::string pattern) {
+	logs::init();
+	spdlog::set_pattern(pattern);
 }
 
 class PlayerPayCrimeGoldTweak {
@@ -30,8 +12,8 @@ public:
 	public:
 		static void Install() {
 			logs::info("Installing PlayerPayCrimeGold hook...");
-			REL::Relocation<std::uintptr_t> playerCharacterVTable{RE::VTABLE_PlayerCharacter[0]};
-			PlayerPayCrimeGold = playerCharacterVTable.write_vfunc(0xbb, PlayerPayCrimeGoldMod);
+			REL::Relocation playerCharacterVTable{ RE::VTABLE_PlayerCharacter[0] };
+			PlayerPayCrimeGold = playerCharacterVTable.write_vfunc(0xBB, PlayerPayCrimeGoldMod);
 			logs::info("Done!");
 		}
 	private:
@@ -46,7 +28,8 @@ public:
 			// load ini
 			CSimpleIniA ini;
 			ini.SetUnicode();
-			SI_Error iniResult = ini.LoadFile("Data\\SKSE\\Plugins\\PlayerPayCrimeGoldTweak.ini");
+			auto iniPath = std::format("Data\\SKSE\\Plugins\\{}.ini", SKSE::GetPluginName());
+			SI_Error iniResult = ini.LoadFile(iniPath.data());
 			// read ini
 			if (iniResult < 0) {
 				logs::info("Settings file not found, input values: {} / {} / {}", goToJail, removeStolenItems, payCrimeGold);
@@ -100,28 +83,28 @@ public:
 void MessageHandler(SKSE::MessagingInterface::Message* a_msg) {
 	switch (a_msg->type) {
 		case SKSE::MessagingInterface::kPostLoad:
-		{
 			PlayerPayCrimeGoldTweak::PlayerPayCrimeGoldHook::Install();
 			logs::info("Waiting for PlayerPayCrimeGold calls");
 			break;
-		}
-		default: break;
+		default:
+			break;
 	}
 }
 
-SKSEPluginLoad(const SKSE::LoadInterface* a_skse)
-{
-	InitLogging();
+SKSEPluginLoad(const SKSE::LoadInterface* a_skse) {
+	SKSE::Init(a_skse, false);
+	InitLogging("%d.%m.%Y %H:%M:%S [%s:%#] %v");
 	// show info
 	const auto plugin = SKSE::PluginDeclaration::GetSingleton();
-	logs::info("{} version {} is loading into {}", plugin->GetName(), plugin->GetVersion(), REL::Module::get().version());
+	logs::info(
+		"{} version {} is loading into {}",
+		plugin->GetName(),
+		plugin->GetVersion().string("."),
+		REL::Module::get().version().string(".")
+	);
 	// init listener
-	SKSE::Init(a_skse);
-	auto messaging = SKSE::GetMessagingInterface();
-	if (!messaging->RegisterListener("SKSE", MessageHandler)) {
-		logs::info("Couldn't register listener");
-		return false;
-	}
-	// done
-	return true;
+	const auto messaging = SKSE::GetMessagingInterface();
+	if (messaging && messaging->RegisterListener(MessageHandler)) return true;
+	logs::info("Couldn't register listener");
+	return false;
 }

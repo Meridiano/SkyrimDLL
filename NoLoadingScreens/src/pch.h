@@ -12,4 +12,4 @@ using namespace std::literals;
 
 #include "mini/ini.h"
 
-#define EXCEPTION throw "NLS_ERROR"
+#define EXCEPTION throw "NLS_EXCEPTION"

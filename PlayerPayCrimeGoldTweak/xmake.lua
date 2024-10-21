@@ -1,22 +1,17 @@
 -- set minimum xmake version
-set_xmakever("2.7.8")
+set_xmakever("2.8.2")
+
+-- includes
+includes("lib/commonlibsse-ng")
 
 -- set project
 set_project("PlayerPayCrimeGoldTweak")
 set_version("1.0.6")
-set_license("MIT License")
-set_languages("c++20")
-set_optimize("faster")
--- disable
--- set_warnings("allextra", "error")
-
--- set allowed
-set_allowedarchs("windows|x64")
-set_allowedmodes("debug", "releasedbg")
+set_license("MIT")
 
 -- set defaults
-set_defaultarchs("windows|x64")
-set_defaultmode("releasedbg")
+set_languages("c++23")
+set_warnings("allextra")
 
 -- add rules
 add_rules("mode.debug", "mode.releasedbg")
@@ -25,18 +20,21 @@ add_rules("plugin.vsxmake.autoupdate")
 -- set policies
 set_policy("package.requires_lock", true)
 
--- require packages
+-- add libs
 add_requires("simpleini")
-add_requires("commonlibsse-ng", { configs = { skyrim_vr = true } })
+
+-- set configs
+set_config("skyrim_vr", true)
+set_config("mode", "releasedbg")
 
 -- targets
 target("PlayerPayCrimeGoldTweak")
-    -- add packages to target
-	add_packages("simpleini")
-    add_packages("fmt", "spdlog", "commonlibsse-ng")
+    -- add dependencies to target
+    add_deps("commonlibsse-ng")
+    add_packages("simpleini")
 
     -- add commonlibsse-ng plugin
-    add_rules("@commonlibsse-ng/plugin", {
+    add_rules("commonlibsse-ng.plugin", {
         name = "PlayerPayCrimeGoldTweak",
         author = "Meridiano",
         description = "No Crime Teleport NG Extended"
@@ -47,22 +45,3 @@ target("PlayerPayCrimeGoldTweak")
     add_headerfiles("src/**.h")
     add_includedirs("src")
     set_pcxxheader("src/pch.h")
-
-    -- copy build files to MODS or SKYRIM paths (remove if not needed)
-    after_build(function(target)
-        local copy = function(env, ext)
-            for _, env in pairs(env:split(";")) do
-                if os.exists(env) then
-                    local plugins = path.join(env, ext, "SKSE/Plugins")
-                    os.mkdir(plugins)
-                    os.trycp(target:targetfile(), plugins)
-                    os.trycp(target:symbolfile(), plugins)
-                end
-            end
-        end
-        if os.getenv("SKYRIM_MODS_PATH") then
-            copy(os.getenv("SKYRIM_MODS_PATH"), target:name())
-        elseif os.getenv("SKYRIM_PATH") then
-            copy(os.getenv("SKYRIM_PATH"), "Data")
-        end
-    end)

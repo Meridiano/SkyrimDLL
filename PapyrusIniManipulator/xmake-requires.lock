@@ -6,10 +6,26 @@
         ["cmake#31fecfc4"] = {
             repo = {
                 branch = "master",
-                commit = "d885463d7cea3253b436ded2f4f17fd8423c4eaa",
+                commit = "0a03ba929e549ea94ca20e7579f288fc0b0d801a",
                 url = "https://github.com/xmake-io/xmake-repo.git"
             },
             version = "3.30.0"
+        },
+        ["directxmath#31fecfc4"] = {
+            repo = {
+                branch = "master",
+                commit = "0a03ba929e549ea94ca20e7579f288fc0b0d801a",
+                url = "https://github.com/xmake-io/xmake-repo.git"
+            },
+            version = "2024.02"
+        },
+        ["directxtk#31fecfc4"] = {
+            repo = {
+                branch = "master",
+                commit = "0a03ba929e549ea94ca20e7579f288fc0b0d801a",
+                url = "https://github.com/xmake-io/xmake-repo.git"
+            },
+            version = "24.2.0"
         },
         ["rapidcsv#31fecfc4"] = {
             repo = {

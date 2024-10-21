@@ -3,54 +3,37 @@
 
 #include "hpp/process.hpp"
 
-std::filesystem::path LogPath() {
-	auto relPath = std::filesystem::path("Data\\SKSE\\Plugins");
-	auto absPath = std::filesystem::absolute(relPath);
-	return absPath;
+void InitLogging(std::string pattern) {
+	logs::init();
+	spdlog::set_pattern(pattern);
 }
 
-void InitLogging()
-{
-	std::optional<std::filesystem::path> path = LogPath();
-	if (!path) return;
-	const auto plugin = SKSE::PluginDeclaration::GetSingleton();
-	*path /= fmt::format("{}.log", plugin->GetName());
-	std::shared_ptr<spdlog::sinks::sink> sink;
-	if (WinAPI::IsDebuggerPresent()) sink = std::make_shared<spdlog::sinks::msvc_sink_mt>();
-	else sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(path->string(), true);
-	auto logger = std::make_shared<spdlog::logger>("global", sink);
-	logger->set_level(spdlog::level::info);
-	logger->flush_on(spdlog::level::info);
-	spdlog::set_default_logger(std::move(logger));
-	spdlog::set_pattern("%d.%m.%Y %H:%M:%S [%s:%#] %v");
-}
-
-void InitMessaging()
-{
+void InitMessaging() {
 	logs::info("Initializing message listener...");
-	const auto interface = SKSE::GetMessagingInterface();
-	if (interface->RegisterListener(ROTProcess::ProcessMessage)) {
+	const auto msgInterface = SKSE::GetMessagingInterface();
+	if (msgInterface && msgInterface->RegisterListener(ROTProcess::ProcessMessage)) {
 		logs::info("Message listener successfully initialized");
 	} else {
 		stl::report_and_fail("Failed to initialize message listener");
 	}
 }
 
-SKSEPluginLoad(const SKSE::LoadInterface* a_skse)
-{
-	// init logs
-	InitLogging();
+SKSEPluginLoad(const SKSE::LoadInterface* a_skse) {
+	// // init skse and logs
+	SKSE::Init(a_skse, false);
+	InitLogging("%d.%m.%Y %H:%M:%S [%s:%#] %v");
 
 	// show info
 	const auto plugin = SKSE::PluginDeclaration::GetSingleton();
-	logs::info("{} version {} is loading into {}", plugin->GetName(), plugin->GetVersion(), REL::Module::get().version());
-	
-	// init skse and stuff
-	SKSE::Init(a_skse);
-	InitMessaging();
-	ROTConfig::LoadConfig();
+	logs::info(
+		"{} version {} is loading into {}",
+		plugin->GetName(),
+		plugin->GetVersion().string("."),
+		REL::Module::get().version().string(".")
+	);
 
 	// done
-	logs::info("{} loading done", plugin->GetName());
+	InitMessaging();
+	ROTConfig::LoadConfig();
 	return true;
 }

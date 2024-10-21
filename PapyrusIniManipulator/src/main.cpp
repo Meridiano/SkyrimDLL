@@ -1,9 +1,9 @@
 #include "hpp/launchers.hpp"
 
 SKSEPluginLoad(const SKSE::LoadInterface* a_skse) {
-	// init logger and skse
-	PIMLaunchers::InitLogging();
-	SKSE::Init(a_skse);
+	// init skse and logger 
+	SKSE::Init(a_skse, false);
+	PIMLaunchers::InitLogging("%d.%m.%Y %H:%M:%S [%s:%#] %v");
 
 	// log versions and init stuff
 	const auto plugin = SKSE::PluginDeclaration::GetSingleton();

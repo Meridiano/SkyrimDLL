@@ -7,10 +7,17 @@ namespace ROTConfig {
 	bool ConfigBool(mINI::INIStructure ini, std::string section, std::string key) {
 		bool result = false;
 		std::string raw = ini.get(section).get(key);
-		std::string lower = ROTUtility::StringToLower(raw);
-		if (lower.compare("true") == 0 || lower.compare("1") == 0) result = true;
-		else if (lower.compare("false") == 0 || lower.compare("0") == 0) result = false;
-		else logs::info("Failed to read [{}]{} ini value", section, key);
+		auto StringToBool = [](std::string str) {
+			auto low = ROTUtility::StringToLower(str);
+			if (!low.compare("true") || !low.compare("1")) return true;
+			if (!low.compare("false") || !low.compare("0")) return false;
+			throw std::invalid_argument("non-boolean string argument");
+		};
+		try {
+			result = StringToBool(raw);
+		} catch (...) {
+			logs::info("Failed to read [{}]{} ini value", section, key);
+		}
 		logs::info("Bool value [{}]{} is {}", section, key, result);
 		return result;
 	}
@@ -39,8 +46,7 @@ namespace ROTConfig {
 	float fRotationAmount;
 
 	void LoadConfig() {
-		const auto plugin = SKSE::PluginDeclaration::GetSingleton();
-		std::string configPath = fmt::format("Data\\SKSE\\Plugins\\{}.ini", plugin->GetName());
+		std::string configPath = std::format("Data\\SKSE\\Plugins\\{}.ini", SKSE::GetPluginName());
 		mINI::INIFile file(configPath);
 		mINI::INIStructure ini;
 		if (file.read(ini)) {

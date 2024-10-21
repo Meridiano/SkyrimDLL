@@ -1,7 +1,5 @@
 #pragma once
 
-#include "hpp/Translation.hpp"
-
 namespace Data {
 	//ConfigLoader.h
 	class ConfigLoader final {
@@ -109,7 +107,7 @@ namespace Data {
 			if (!file) continue;
 			auto fileName = fs::path(file->fileName);
 			fileName.replace_extension("json"sv);
-			auto directory = fs::path(fmt::format("SKSE/Plugins/{}", SKSE::PluginDeclaration::GetSingleton()->GetName()));
+			auto directory = fs::path(std::format("SKSE/Plugins/{}", SKSE::GetPluginName()));
 			auto configFile = directory / fileName;
 			LoadConfig(configFile);
 		}

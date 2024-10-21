@@ -3,7 +3,6 @@
 #include <RE/Skyrim.h>
 #include <SKSE/SKSE.h>
 
-namespace WinAPI = REX::W32;
 namespace fs = std::filesystem;
 namespace logs = SKSE::log;
 namespace stl = SKSE::stl;

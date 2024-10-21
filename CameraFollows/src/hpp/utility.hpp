@@ -6,19 +6,19 @@ namespace CamFolUtility {
 	std::string TransformNode;
 	std::string ConsoleCommand;
 
-	bool IsEqual(const std::string one, const std::string two) {
+	bool EqualNoCase(const std::string one, const std::string two) {
 		std::size_t length = one.length();
 		if (two.length() != length) return false;
 		return (strnicmp(one.data(), two.data(), length) == 0);
 	}
 
 	std::string SetProcessEnabled(std::string data) {
-		bool t = IsEqual(data, "1") || IsEqual(data, "true");
+		bool t = EqualNoCase(data, "1") || EqualNoCase(data, "true");
 		if (t) {
 			ProcessEnabled = true;
 			return "CamFol.Success >> Enabled";
 		}
-		bool f = IsEqual(data, "0") || IsEqual(data, "false");
+		bool f = EqualNoCase(data, "0") || EqualNoCase(data, "false");
 		if (f) {
 			ProcessEnabled = false;
 			return "CamFol.Success >> Disabled";

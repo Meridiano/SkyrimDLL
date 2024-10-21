@@ -100,6 +100,8 @@ namespace SRERegulars {
 			logs::info("ReplaceWith-Failed >> Begin\n{}\n{}\n{}", info, arguments.modA, arguments.modB);
 			logs::info("ReplaceWith-Failed >> End");
 		}
+		std::string failed;
+		return failed;
 	}
 
 }

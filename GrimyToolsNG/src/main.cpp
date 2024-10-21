@@ -1,20 +1,9 @@
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/msvc_sink.h>
 
-void InitLogging() {
-	auto path = logs::log_directory();
-	if (!path) return;
-	const auto plugin = SKSE::PluginDeclaration::GetSingleton();
-	*path /= std::format("{}.log", plugin->GetName());
-	std::vector<spdlog::sink_ptr> sinks{ 
-		std::make_shared<spdlog::sinks::basic_file_sink_mt>(path->string(), true), 
-		std::make_shared<spdlog::sinks::msvc_sink_mt>() 
-	};
-	auto logger = std::make_shared<spdlog::logger>("global", sinks.begin(), sinks.end());
-	logger->set_level(spdlog::level::info);
-	logger->flush_on(spdlog::level::info);
-	spdlog::set_default_logger(std::move(logger));
-	spdlog::set_pattern("%d.%m.%Y %H:%M:%S [%s:%#] %v");
+void InitLogging(std::string pattern) {
+	logs::init();
+	spdlog::set_pattern(pattern);
 }
 
 namespace GPNGUtility {
@@ -49,7 +38,7 @@ namespace GPNGInternal {
 		auto theDataHandler = RE::TESDataHandler::GetSingleton();
 		auto allEnch = theDataHandler->GetFormArray<RE::EnchantmentItem>();
 		for (auto theEnch : allEnch) {
-			result += (IsArmorEnch(theEnch) ? 0 : 1);
+			result += theEnch ? (IsArmorEnch(theEnch) ? 0 : 1) : 0;
 		}
 		return result;
 	}
@@ -58,16 +47,13 @@ namespace GPNGInternal {
 		auto theDataHandler = RE::TESDataHandler::GetSingleton();
 		auto allEnch = theDataHandler->GetFormArray<RE::EnchantmentItem>();
 		for (auto theEnch : allEnch) {
-			result += (IsArmorEnch(theEnch) ? 1 : 0);
+			result += theEnch ? (IsArmorEnch(theEnch) ? 1 : 0) : 0;
 		}
 		return result;
 	}
 
 	RE::TESObjectARMO* GetArmorTemplate(RE::TESObjectARMO* theArmor) {
-		if (theArmor) {
-			auto theTemplate = theArmor->templateArmor;
-			return (theTemplate ? theTemplate : nullptr);
-		}
+		if (theArmor) return theArmor->templateArmor;
 		return nullptr;
 	}
 
@@ -83,18 +69,20 @@ namespace GPNGInternal {
 
 	// movement get-set
 	float GetMovementType(RE::TESForm* theForm, int32_t indexOne, int32_t indexTwo) {
-		if (!theForm) return 0.0F;
-		auto theMovement = skyrim_cast<RE::BGSMovementType*>(theForm);
-		if (theMovement && GPNGUtility::IsInRange(indexOne, 0, 4) && GPNGUtility::IsInRange(indexTwo, 0, 1)) {
-			return theMovement->movementTypeData.defaultData.speeds[indexOne][indexTwo];
+		if (theForm) {
+			auto theMovement = skyrim_cast<RE::BGSMovementType*>(theForm);
+			if (theMovement && GPNGUtility::IsInRange(indexOne, 0, 4) && GPNGUtility::IsInRange(indexTwo, 0, 1)) {
+				return theMovement->movementTypeData.defaultData.speeds[indexOne][indexTwo];
+			}
 		}
 		return 0.0F;
 	}
 	void SetMovementType(RE::TESForm* theForm, int32_t indexOne, int32_t indexTwo, float value) {
-		if (!theForm) return;
-		auto theMovement = skyrim_cast<RE::BGSMovementType*>(theForm);
-		if (theMovement && GPNGUtility::IsInRange(indexOne, 0, 4) && GPNGUtility::IsInRange(indexTwo, 0, 1) && value >= 0.0F) {
-			theMovement->movementTypeData.defaultData.speeds[indexOne][indexTwo] = value;
+		if (theForm) {
+			auto theMovement = skyrim_cast<RE::BGSMovementType*>(theForm);
+			if (theMovement && GPNGUtility::IsInRange(indexOne, 0, 4) && GPNGUtility::IsInRange(indexTwo, 0, 1) && value >= 0.0F) {
+				theMovement->movementTypeData.defaultData.speeds[indexOne][indexTwo] = value;
+			}
 		}
 	}
 
@@ -211,12 +199,12 @@ namespace GPNGInternal {
 				case 11: {
 					using WDF = RE::TESWeather::WeatherDataFlag;
 					theWeather->data.flags = WDF::kNone;
-					auto bPleasant = (bool)(value8 & (uint8_t)WDF::kPleasant);
-					auto bCloudy = (bool)(value8 & (uint8_t)WDF::kCloudy);
-					auto bRainy = (bool)(value8 & (uint8_t)WDF::kRainy);
-					auto bSnow = (bool)(value8 & (uint8_t)WDF::kSnow);
-					auto bPermAurora = (bool)(value8 & (uint8_t)WDF::kPermAurora);
-					auto bAuroraFollowsSun = (bool)(value8 & (uint8_t)WDF::kAuroraFollowsSun);
+					bool bPleasant = value8 & (uint8_t)WDF::kPleasant;
+					bool bCloudy = value8 & (uint8_t)WDF::kCloudy;
+					bool bRainy = value8 & (uint8_t)WDF::kRainy;
+					bool bSnow = value8 & (uint8_t)WDF::kSnow;
+					bool bPermAurora = value8 & (uint8_t)WDF::kPermAurora;
+					bool bAuroraFollowsSun = value8 & (uint8_t)WDF::kAuroraFollowsSun;
 					theWeather->data.flags.set(
 						(bPleasant ? WDF::kPleasant : WDF::kNone),
 						(bCloudy ? WDF::kCloudy : WDF::kNone),
@@ -228,7 +216,7 @@ namespace GPNGInternal {
 					break;
 				}
 				case 12: {
-					value32 = (uint32_t)GPNGUtility::RestrictInt(value32, 0, 16777215);
+					value32 = (uint32_t)GPNGUtility::RestrictInt(value32, 0, 0xFFFFFF);
 					theWeather->data.lightningColor.red = (uint8_t)((value32 & 0xFF0000) >> 16);
 					theWeather->data.lightningColor.green = (uint8_t)((value32 & 0x00FF00) >> 8);
 					theWeather->data.lightningColor.blue = (uint8_t)((value32 & 0x0000FF) >> 0);
@@ -509,47 +497,45 @@ namespace GPNGPapyrus {
 
 	// registerer
 	bool Register(RE::BSScript::IVirtualMachine* virtualMachine) {
-		virtualMachine->RegisterFunction("GetWeaponEnchCount", "GrimyToolsPluginScript", GPNGPapyrus::GetWeaponEnchCount);
-		virtualMachine->RegisterFunction("GetArmorEnchCount", "GrimyToolsPluginScript", GPNGPapyrus::GetArmorEnchCount);
-		virtualMachine->RegisterFunction("GetArmorTemplate", "GrimyToolsPluginScript", GPNGPapyrus::GetArmorTemplate);
-		virtualMachine->RegisterFunction("GetLightDuration", "GrimyToolsPluginScript", GPNGPapyrus::GetLightDuration);
-		virtualMachine->RegisterFunction("SetLightDuration", "GrimyToolsPluginScript", GPNGPapyrus::SetLightDuration);
-		virtualMachine->RegisterFunction("GetMovementType", "GrimyToolsPluginScript", GPNGPapyrus::GetMovementType);
-		virtualMachine->RegisterFunction("SetMovementType", "GrimyToolsPluginScript", GPNGPapyrus::SetMovementType);
-		virtualMachine->RegisterFunction("GetWeatherInt", "GrimyToolsPluginScript", GPNGPapyrus::GetWeatherInt);
-		virtualMachine->RegisterFunction("SetWeatherInt", "GrimyToolsPluginScript", GPNGPapyrus::SetWeatherInt);
-		virtualMachine->RegisterFunction("SetSpellNthMagicEffect", "GrimyToolsPluginScript", GPNGPapyrus::SetSpellNthMagicEffect);
-		virtualMachine->RegisterFunction("GetSpellType", "GrimyToolsPluginScript", GPNGPapyrus::GetSpellType);
-		virtualMachine->RegisterFunction("GetSpellCastType", "GrimyToolsPluginScript", GPNGPapyrus::GetSpellCastType);
-		virtualMachine->RegisterFunction("GetSpellDelivery", "GrimyToolsPluginScript", GPNGPapyrus::GetSpellDelivery);
-		virtualMachine->RegisterFunction("GetSpellChargeTime", "GrimyToolsPluginScript", GPNGPapyrus::GetSpellChargeTime);
-		virtualMachine->RegisterFunction("GetSpellRange", "GrimyToolsPluginScript", GPNGPapyrus::GetSpellRange);
-		virtualMachine->RegisterFunction("SetSpellType", "GrimyToolsPluginScript", GPNGPapyrus::SetSpellType);
-		virtualMachine->RegisterFunction("SetSpellCastType", "GrimyToolsPluginScript", GPNGPapyrus::SetSpellCastType);
-		virtualMachine->RegisterFunction("SetSpellCastTime", "GrimyToolsPluginScript", GPNGPapyrus::SetSpellCastTime);
-		virtualMachine->RegisterFunction("SetSpellChargeTime", "GrimyToolsPluginScript", GPNGPapyrus::SetSpellChargeTime);
-		virtualMachine->RegisterFunction("SetSpellDelivery", "GrimyToolsPluginScript", GPNGPapyrus::SetSpellDelivery);
-		virtualMachine->RegisterFunction("SetSpellPerk", "GrimyToolsPluginScript", GPNGPapyrus::SetSpellPerk);
-		virtualMachine->RegisterFunction("SetMagickaCost", "GrimyToolsPluginScript", GPNGPapyrus::SetMagickaCost);
-		virtualMachine->RegisterFunction("MergeSpells", "GrimyToolsPluginScript", GPNGPapyrus::MergeSpells);
+		std::string className = "GrimyToolsPluginScript";
+		virtualMachine->RegisterFunction("GetWeaponEnchCount", className, GPNGPapyrus::GetWeaponEnchCount);
+		virtualMachine->RegisterFunction("GetArmorEnchCount", className, GPNGPapyrus::GetArmorEnchCount);
+		virtualMachine->RegisterFunction("GetArmorTemplate", className, GPNGPapyrus::GetArmorTemplate);
+		virtualMachine->RegisterFunction("GetLightDuration", className, GPNGPapyrus::GetLightDuration);
+		virtualMachine->RegisterFunction("SetLightDuration", className, GPNGPapyrus::SetLightDuration);
+		virtualMachine->RegisterFunction("GetMovementType", className, GPNGPapyrus::GetMovementType);
+		virtualMachine->RegisterFunction("SetMovementType", className, GPNGPapyrus::SetMovementType);
+		virtualMachine->RegisterFunction("GetWeatherInt", className, GPNGPapyrus::GetWeatherInt);
+		virtualMachine->RegisterFunction("SetWeatherInt", className, GPNGPapyrus::SetWeatherInt);
+		virtualMachine->RegisterFunction("SetSpellNthMagicEffect", className, GPNGPapyrus::SetSpellNthMagicEffect);
+		virtualMachine->RegisterFunction("GetSpellType", className, GPNGPapyrus::GetSpellType);
+		virtualMachine->RegisterFunction("GetSpellCastType", className, GPNGPapyrus::GetSpellCastType);
+		virtualMachine->RegisterFunction("GetSpellDelivery", className, GPNGPapyrus::GetSpellDelivery);
+		virtualMachine->RegisterFunction("GetSpellChargeTime", className, GPNGPapyrus::GetSpellChargeTime);
+		virtualMachine->RegisterFunction("GetSpellRange", className, GPNGPapyrus::GetSpellRange);
+		virtualMachine->RegisterFunction("SetSpellType", className, GPNGPapyrus::SetSpellType);
+		virtualMachine->RegisterFunction("SetSpellCastType", className, GPNGPapyrus::SetSpellCastType);
+		virtualMachine->RegisterFunction("SetSpellCastTime", className, GPNGPapyrus::SetSpellCastTime);
+		virtualMachine->RegisterFunction("SetSpellChargeTime", className, GPNGPapyrus::SetSpellChargeTime);
+		virtualMachine->RegisterFunction("SetSpellDelivery", className, GPNGPapyrus::SetSpellDelivery);
+		virtualMachine->RegisterFunction("SetSpellPerk", className, GPNGPapyrus::SetSpellPerk);
+		virtualMachine->RegisterFunction("SetMagickaCost", className, GPNGPapyrus::SetMagickaCost);
+		virtualMachine->RegisterFunction("MergeSpells", className, GPNGPapyrus::MergeSpells);
 		return true;
 	}
 }
 
 SKSEPluginLoad(const SKSE::LoadInterface* a_skse) {
-	InitLogging();
+	SKSE::Init(a_skse, false);
+	InitLogging("%d.%m.%Y %H:%M:%S [%s:%#] %v");
 
 	const auto plugin = SKSE::PluginDeclaration::GetSingleton();
-	const auto gameVersion = REL::Module::get().version();
 	logs::info(
-		"{} {} version {} is loading into {}",
-		GPNGUtility::logLevelI,
+		"{} {} version {} is loading into {}", GPNGUtility::logLevelI,
 		plugin->GetName(),
-		plugin->GetVersion(),
-		gameVersion.string(".")
+		plugin->GetVersion().string("."),
+		REL::Module::get().version().string(".")
 	);
-
-	SKSE::Init(a_skse);
 
 	const auto papyrusInterface = SKSE::GetPapyrusInterface();
 	if (papyrusInterface) {

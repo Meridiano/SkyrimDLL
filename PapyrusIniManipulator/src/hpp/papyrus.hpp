@@ -62,7 +62,7 @@ namespace PIMPapyrus {
 	}
 
 	bool Register(RE::BSScript::IVirtualMachine* a_vm) {
-		const auto className = SKSE::PluginDeclaration::GetSingleton()->GetName();
+		const auto className = SKSE::GetPluginName();
 
 		// general
 		a_vm->RegisterFunction("GetVersion", className, GetVersion);

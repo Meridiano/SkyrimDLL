@@ -25,18 +25,19 @@ namespace LiAtHooks {
 				logs::info("First-person camera toggle / {} >> {}", oldState, newState);
 				oldState = newState;
 			}
-			if (newState) LiAtUtility::ProcessLight(player);
+			if (player && newState) LiAtUtility::ProcessLight(player);
 		}
 		static inline REL::Relocation<decltype(OnUpdateMod)> OnUpdate;
 	};
 
 	void MessageListener(SKSE::MessagingInterface::Message* a_msg) {
-		if (a_msg->type == SKSE::MessagingInterface::kDataLoaded) {
+		if (a_msg->type == SKSE::MessagingInterface::kPostLoad) {
+			UpdateHook::Install();
+		} else if (a_msg->type == SKSE::MessagingInterface::kDataLoaded) {
 			player = RE::PlayerCharacter::GetSingleton();
 			if (player) logs::info("PlayerCharacter = {:X}", (std::uint64_t)player);
 			else stl::report_and_fail("Error: PlayerCharacter not found");
 			LiAtUtility::SetUpdateData();
-			UpdateHook::Install();
 		} else return;
 	}
 

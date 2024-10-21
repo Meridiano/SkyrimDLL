@@ -48,8 +48,7 @@ namespace NLSConfig {
 	}
 
 	void LoadConfig() {
-		const auto plugin = SKSE::PluginDeclaration::GetSingleton();
-		const auto path = std::format("Data/SKSE/Plugins/{}.ini", plugin->GetName());
+		const auto path = std::format("Data/SKSE/Plugins/{}.ini", SKSE::GetPluginName());
 		mINI::INIFile file(path);
 		mINI::INIStructure ini;
 		if (file.read(ini)) {

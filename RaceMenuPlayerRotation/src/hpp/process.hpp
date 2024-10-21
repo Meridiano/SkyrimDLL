@@ -122,11 +122,12 @@ namespace ROTProcess {
 
 	void ProcessMessage(SKSE::MessagingInterface::Message* a_msg) {
 		if (a_msg->type == SKSE::MessagingInterface::kInputLoaded) {
+			auto manager = EventManager::GetSingleton();
 			if (const auto input = RE::BSInputDeviceManager::GetSingleton(); input) {
-				input->AddEventSink<RE::InputEvent*>(EventManager::GetSingleton());
+				input->AddEventSink<RE::InputEvent*>(manager);
 			}
 			if (const auto ui = RE::UI::GetSingleton(); ui) {
-				ui->AddEventSink<RE::MenuOpenCloseEvent>(EventManager::GetSingleton());
+				ui->AddEventSink<RE::MenuOpenCloseEvent>(manager);
 			}
 		}
 	}

@@ -3,20 +3,9 @@
 
 #include "hpp/console.hpp"
 
-void InitLogging() {
-	auto path = logs::log_directory();
-	if (!path) return;
-	const auto plugin = SKSE::PluginDeclaration::GetSingleton();
-	*path /= std::format("{}.log", plugin->GetName());
-	std::vector<spdlog::sink_ptr> sinks{ 
-		std::make_shared<spdlog::sinks::basic_file_sink_mt>(path->string(), true), 
-		std::make_shared<spdlog::sinks::msvc_sink_mt>() 
-	};
-	auto logger = std::make_shared<spdlog::logger>("global", sinks.begin(), sinks.end());
-	logger->set_level(spdlog::level::info);
-	logger->flush_on(spdlog::level::info);
-	spdlog::set_default_logger(std::move(logger));
-	spdlog::set_pattern("%d.%m.%Y %H:%M:%S [%s:%#] %v");
+void InitLogging(std::string pattern) {
+	logs::init();
+	spdlog::set_pattern(pattern);
 }
 
 bool InitMessaging() {
@@ -30,7 +19,8 @@ bool InitMessaging() {
 }
 
 SKSEPluginLoad(const SKSE::LoadInterface* a_skse) {
-	InitLogging();
+	SKSE::Init(a_skse, false);
+	InitLogging("%d.%m.%Y %H:%M:%S [%s:%#] %v");
 
 	// info
 	const auto plugin = SKSE::PluginDeclaration::GetSingleton();
@@ -40,9 +30,6 @@ SKSEPluginLoad(const SKSE::LoadInterface* a_skse) {
 		plugin->GetVersion().string("."),
 		REL::Module::get().version().string(".")
 	);
-
-	// skse
-	SKSE::Init(a_skse);
 
 	// stuff
 	InitMessaging();

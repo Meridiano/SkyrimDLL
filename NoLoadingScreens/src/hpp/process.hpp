@@ -26,7 +26,7 @@ namespace NLSProcess {
 			}
 			if (form && process) {
 				if (auto data = form->loadNIFData; data) {
-					data->loadNIF = reinterpret_cast<RE::TESBoundObject*>(stat);
+					data->loadNIF = static_cast<RE::TESBoundObject*>(stat);
 				}
 				form->loadingText = text;
 			};

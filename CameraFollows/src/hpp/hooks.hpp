@@ -13,12 +13,9 @@ namespace CamFolHooks {
 	class UpdatePCHook {
 	public:
 		static void Install() {
-			logs::info("Installing new UpdatePC hook");
 			REL::Relocation<std::uintptr_t> pcVTable{ RE::VTABLE_PlayerCharacter[0] };
 			UpdatePC = pcVTable.write_vfunc(0xAD, UpdatePCMod);
-			
-			if (UpdatePC.address()) logs::info("Hook done!");
-			else logs::info("Hook failed!");
+			logs::info("New UpdatePC hook installed");
 		}
 	private:
 		static void UpdatePCMod(RE::PlayerCharacter* pc, float delta) {
@@ -35,7 +32,8 @@ namespace CamFolHooks {
 		// set pointers
 		pCamera = RE::PlayerCamera::GetSingleton();
 
-		bool post1130 = REL::Module::get().IsAE() && (REL::Module::get().version().patch() > 0x400);
+		auto module = &REL::Module::get();
+		bool post1130 = module->IsAE() && (module->version().patch() > 0x400);
 		pControls = CamFolUtility::GetMember<std::uint32_t>(RE::ControlMap::GetSingleton(), post1130 ? 0x120 : 0x118);
 
 		pUserInterface = RE::UI::GetSingleton();

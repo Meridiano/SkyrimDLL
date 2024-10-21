@@ -1,8 +1,8 @@
 #include "hpp/launch.hpp"
 
 SKSEPluginLoad(const SKSE::LoadInterface* a_skse) {
-	NLSLaunch::InitLogging();
-	
+	SKSE::Init(a_skse, false);
+	NLSLaunch::InitLogging("%d.%m.%Y %H:%M:%S [%s:%#] %v");
 	const auto plugin = SKSE::PluginDeclaration::GetSingleton();
 	logs::info(
 		"{} version {} is loading into {}",
@@ -10,6 +10,5 @@ SKSEPluginLoad(const SKSE::LoadInterface* a_skse) {
 		plugin->GetVersion().string("."),
 		REL::Module::get().version().string(".")
 	);
-	SKSE::Init(a_skse);
 	return NLSLaunch::InitMessaging();
 }

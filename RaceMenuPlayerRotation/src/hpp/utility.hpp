@@ -38,13 +38,12 @@ namespace ROTUtility {
 		return 0;
 	}
 
-	unsigned char CharToLower(unsigned char ch) {
-		return (unsigned char)(std::tolower(ch));
-	}
-
 	std::string StringToLower(std::string toConvert) {
 		std::string lower = toConvert;
-		std::transform(toConvert.begin(), toConvert.end(), lower.begin(), CharToLower);
+		std::transform(
+			toConvert.begin(), toConvert.end(), lower.begin(),
+			[](unsigned char uch) { return std::tolower(uch); }
+		);
 		return lower;
 	}
 

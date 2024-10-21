@@ -7,12 +7,6 @@ namespace PIMUtility {
 		return std::format("Data\\SKSE\\Plugins\\{}.ini", plugin->GetName());
 	}
 
-	fs::path PluginLogPath() {
-		auto relPath = fs::path("Data\\SKSE\\Plugins");
-		auto absPath = fs::absolute(relPath);
-		return absPath;
-	}
-
 	bool EqualStrings(std::string a, std::string b, bool caseInd) {
 		auto length = a.length();
 		if (b.length() == length) {

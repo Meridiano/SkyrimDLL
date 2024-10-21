@@ -3,20 +3,9 @@
 
 #include "hpp/hooks.hpp"
 
-void InitLogging() {
-	auto path = LiAtUtility::GetLogsDirectory();
-	if (!path) return;
-	const auto plugin = SKSE::PluginDeclaration::GetSingleton();
-	*path /= fmt::format("{}.log", plugin->GetName());
-	std::vector<spdlog::sink_ptr> sinks{
-		std::make_shared<spdlog::sinks::basic_file_sink_mt>(path->string(), true), 
-		std::make_shared<spdlog::sinks::msvc_sink_mt>() 
-	};
-	auto logger = std::make_shared<spdlog::logger>("global", sinks.begin(), sinks.end());
-	logger->set_level(spdlog::level::info);
-	logger->flush_on(spdlog::level::info);
-	spdlog::set_default_logger(std::move(logger));
-	spdlog::set_pattern("%d.%m.%Y %H:%M:%S [%s:%#] %v");
+void InitLogging(std::string pattern) {
+	logs::init();
+	spdlog::set_pattern(pattern);
 }
 
 bool InitMessaging() {
@@ -29,9 +18,9 @@ bool InitMessaging() {
 	return false;
 }
 
-SKSEPluginLoad(const SKSE::LoadInterface* a_skse)
-{
-	InitLogging();
+SKSEPluginLoad(const SKSE::LoadInterface* a_skse) {
+	SKSE::Init(a_skse, false);
+	InitLogging("%d.%m.%Y %H:%M:%S [%s:%#] %v");
 
 	// info
 	const auto plugin = SKSE::PluginDeclaration::GetSingleton();
@@ -42,12 +31,6 @@ SKSEPluginLoad(const SKSE::LoadInterface* a_skse)
 		REL::Module::get().version().string(".")
 	);
 
-	// skse
-	SKSE::Init(a_skse);
 	SKSE::AllocTrampoline(128);
-	InitMessaging();
-
-	// done
-	logs::info("{} plugin was loaded", plugin->GetName());
-	return true;
+	return InitMessaging();
 }
