@@ -20,9 +20,6 @@ add_rules("plugin.vsxmake.autoupdate")
 -- set policies
 set_policy("package.requires_lock", true)
 
--- add libs
-add_requires("nlohmann_json")
-
 -- set configs
 set_config("skyrim_vr", false)
 set_config("mode", "releasedbg")
@@ -31,7 +28,6 @@ set_config("mode", "releasedbg")
 target("CameraFollows")
     -- add dependencies to target
     add_deps("commonlibsse-ng")
-    add_packages("nlohmann_json")
 
     -- add commonlibsse-ng plugin
     add_rules("commonlibsse-ng.plugin", {
@@ -45,3 +41,12 @@ target("CameraFollows")
     add_headerfiles("src/**.h")
     add_includedirs("src")
     set_pcxxheader("src/pch.h")
+
+    -- curl downloader
+    local function curl(url, path)
+        return format('curl -k "%s" -o "%s" --create-dirs', url, path)
+    end
+    on_load(function (target)
+        os.run(curl("https://raw.githubusercontent.com/metayeti/mINI/refs/heads/master/src/mini/ini.h", "lib/mini/ini.h"))
+        os.run(curl("https://raw.githubusercontent.com/nlohmann/json/refs/heads/develop/single_include/nlohmann/json.hpp", "lib/nlohmann/json.hpp"))
+    end)

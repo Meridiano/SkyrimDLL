@@ -9,4 +9,5 @@ namespace stl = SKSE::stl;
 using namespace std::literals;
 
 // my own includes
-#include "jpcre2/jpcre2.hpp"
+#include "../lib/jpcre2/jpcre2.hpp"
+using jp = jpcre2::select<wchar_t>;

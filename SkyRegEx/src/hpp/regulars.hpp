@@ -4,8 +4,6 @@
 
 namespace SRERegulars {
 
-	typedef jpcre2::select<wchar_t> jp;
-
 	bool RegIsMatching(SREUtility::MatchStruct arguments) {
 		bool result = false;
 		jp::Regex re;
@@ -56,8 +54,7 @@ namespace SRERegulars {
 			logs::info("MatchInfo-Failed >> Begin\n{}\n{}\n{}", info, arguments.modA, arguments.modB);
 			logs::info("MatchInfo-Failed >> End");
 		}
-		std::vector<std::int32_t> failed;
-		return failed;
+		return {};
 	}
 
 	std::vector<std::string> RegMatchData(SREUtility::MatchStruct arguments) {
@@ -84,8 +81,7 @@ namespace SRERegulars {
 			logs::info("MatchData-Failed >> Begin\n{}\n{}\n{}", info, arguments.modA, arguments.modB);
 			logs::info("MatchData-Failed >> End");
 		}
-		std::vector<std::string> failed;
-		return failed;
+		return {};
 	}
 
 	std::string RegReplaceWith(SREUtility::ReplaceStruct arguments) {
@@ -100,8 +96,7 @@ namespace SRERegulars {
 			logs::info("ReplaceWith-Failed >> Begin\n{}\n{}\n{}", info, arguments.modA, arguments.modB);
 			logs::info("ReplaceWith-Failed >> End");
 		}
-		std::string failed;
-		return failed;
+		return {};
 	}
 
 }

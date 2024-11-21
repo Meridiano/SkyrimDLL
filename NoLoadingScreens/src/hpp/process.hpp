@@ -9,7 +9,7 @@ namespace NLSProcess {
 		auto text = NLSConfig::sNewText;
 		if (list.size() > 0) for (auto form : list) {
 			auto filename = NLSUtility::SourceFilenameLower(form, tesDH);
-			bool process = !filename.empty();
+			bool process = (filename.size() > 0);
 			switch (mode) {
 				case 0:
 					process = true;

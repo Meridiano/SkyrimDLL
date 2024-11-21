@@ -83,7 +83,7 @@ namespace CamFolUtility {
 	bool ProcessConditions(RE::PlayerCamera* camera, std::uint32_t* controls, RE::UI* userInterface, RE::PlayerCharacter* player, RE::VATS* vats) {
 		if (ProcessEnabled) {
 			bool a = IsInFirstPerson(camera);
-			bool b = (*controls & (int)RE::ControlMap::UEFlag::kMovement);
+			bool b = (*controls & (UINT32)RE::ControlMap::UEFlag::kMovement);
 			bool c = !userInterface->IsMenuOpen(RE::MapMenu::MENU_NAME);
 			bool d = !player->GetOccupiedFurniture().get().get();
 			bool e = !player->IsInKillMove();

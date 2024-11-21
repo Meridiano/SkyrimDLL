@@ -45,3 +45,11 @@ target("SkyRegEx")
     add_headerfiles("src/**.h")
     add_includedirs("src")
     set_pcxxheader("src/pch.h")
+
+    -- curl downloader
+    local function curl(url, path)
+        return format('curl -k "%s" -o "%s" --create-dirs', url, path)
+    end
+    on_load(function (target)
+        os.run(curl("https://raw.githubusercontent.com/jpcre2/jpcre2/refs/heads/master/src/jpcre2.hpp", "lib/jpcre2/jpcre2.hpp"))
+    end)

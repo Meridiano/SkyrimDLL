@@ -5,8 +5,8 @@
 namespace PIMPapyrus {
 
 	std::string GetVersion(RE::StaticFunctionTag* base) {
-		const auto plugin = SKSE::PluginDeclaration::GetSingleton();
-		return plugin->GetVersion().string("-");
+		const auto version = SKSE::GetPluginVersion();
+		return version.string("-");
 	}
 
 	std::string GetTranslation(RE::StaticFunctionTag* base, std::string key) {

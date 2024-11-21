@@ -6,7 +6,7 @@ includes("lib/commonlibsse-ng")
 
 -- set project
 set_project("NoLoadingScreens")
-set_version("1.0.0")
+set_version("2.0.0")
 set_license("MIT")
 
 -- set defaults
@@ -41,3 +41,11 @@ target("NoLoadingScreens")
     add_headerfiles("src/**.h")
     add_includedirs("src")
     set_pcxxheader("src/pch.h")
+
+    -- curl downloader
+    local function curl(url, path)
+        return format('curl -k "%s" -o "%s" --create-dirs', url, path)
+    end
+    on_load(function (target)
+        os.run(curl("https://raw.githubusercontent.com/metayeti/mINI/refs/heads/master/src/mini/ini.h", "lib/mini/ini.h"))
+    end)

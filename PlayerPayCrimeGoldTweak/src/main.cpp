@@ -1,6 +1,3 @@
-#include <spdlog/sinks/basic_file_sink.h>
-#include <spdlog/sinks/msvc_sink.h>
-
 void InitLogging(std::string pattern) {
 	logs::init();
 	spdlog::set_pattern(pattern);
@@ -24,7 +21,7 @@ public:
 			bool payCrimeGold = true;
 			// check faction form id
 			bool factionIsVanilla = ((a_faction->GetFormID() >> 24) <= 0x4);
-			logs::info("PlayerPayCrimeGold called, faction is vanilla: {}, processing", factionIsVanilla);
+			logs::info("PlayerPayCrimeGold called, faction is {}, processing", factionIsVanilla ? "vanilla" : "not vanilla");
 			// load ini
 			CSimpleIniA ini;
 			ini.SetUnicode();

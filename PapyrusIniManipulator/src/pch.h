@@ -10,8 +10,6 @@ namespace stl = SKSE::stl;
 using namespace std::literals;
 
 // my own includes
-#include "mini/ini.h"
-
-// logger
-#include <spdlog/sinks/basic_file_sink.h>
-#include <spdlog/sinks/msvc_sink.h>
+#include "../lib/mini/ini.h"
+static const std::string tab(4, ' ');
+static const std::string d_tab(tab + tab);

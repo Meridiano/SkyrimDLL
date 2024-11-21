@@ -7,7 +7,7 @@ add_requires("xbyak")
 
 -- set project
 set_project("GetIniConsoleFix")
-set_version("1.0.0")
+set_version("1.0.1")
 set_license("MIT")
 
 -- set defaults

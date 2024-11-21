@@ -45,3 +45,13 @@ target("CraftingCategories")
     add_headerfiles("src/**.h")
     add_includedirs("src")
     set_pcxxheader("src/pch.h")
+
+    -- curl downloader
+    local function curl(url, path)
+        return format('curl -k "%s" -o "%s" --create-dirs', url, path)
+    end
+    on_load(function (target)
+        os.run(curl("https://raw.githubusercontent.com/Tessil/ordered-map/refs/heads/master/include/tsl/ordered_hash.h", "lib/tsl/ordered_hash.h"))
+        os.run(curl("https://raw.githubusercontent.com/Tessil/ordered-map/refs/heads/master/include/tsl/ordered_map.h", "lib/tsl/ordered_map.h"))
+        os.run(curl("https://raw.githubusercontent.com/Tessil/ordered-map/refs/heads/master/include/tsl/ordered_set.h", "lib/tsl/ordered_set.h"))
+    end)

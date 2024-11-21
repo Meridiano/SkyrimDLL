@@ -27,14 +27,6 @@
             },
             version = "24.2.0"
         },
-        ["nlohmann_json#31fecfc4"] = {
-            repo = {
-                branch = "master",
-                commit = "d885463d7cea3253b436ded2f4f17fd8423c4eaa",
-                url = "https://github.com/xmake-io/xmake-repo.git"
-            },
-            version = "v3.11.3"
-        },
         ["spdlog#9c36f0a9"] = {
             repo = {
                 branch = "master",

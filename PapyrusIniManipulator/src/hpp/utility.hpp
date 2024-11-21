@@ -3,14 +3,14 @@
 namespace PIMUtility {
 	
 	std::string PluginConfigPath() {
-		const auto plugin = SKSE::PluginDeclaration::GetSingleton();
-		return std::format("Data\\SKSE\\Plugins\\{}.ini", plugin->GetName());
+		const auto pluginName = SKSE::GetPluginName();
+		return std::format("Data\\SKSE\\Plugins\\{}.ini", pluginName);
 	}
 
-	bool EqualStrings(std::string a, std::string b, bool caseInd) {
+	bool EqualStrings(std::string a, std::string b, bool noCase) {
 		auto length = a.length();
 		if (b.length() == length) {
-			if (caseInd) return (strnicmp(a.data(), b.data(), length) == 0);
+			if (noCase) return (strnicmp(a.data(), b.data(), length) == 0);
 			else return (strncmp(a.data(), b.data(), length) == 0);
 		}
 		return false;

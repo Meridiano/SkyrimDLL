@@ -7,9 +7,6 @@ namespace logs = SKSE::log;
 namespace stl = SKSE::stl;
 using namespace std::literals;
 
-#include <spdlog/sinks/basic_file_sink.h>
-#include <spdlog/sinks/msvc_sink.h>
+#include "../lib/mini/ini.h"
 
-#include "mini/ini.h"
-
-#define EXCEPTION throw "NLS_EXCEPTION"
+#define EXCEPTION throw std::exception("NLS_EXCEPTION")

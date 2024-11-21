@@ -19,8 +19,7 @@ namespace SREUtility {
 
 	std::vector<std::wstring> ReadFile(std::string filename) {
 		std::vector<std::wstring> result;
-		std::string path = std::format("Data\\SKSE\\Plugins\\SkyRegEx\\{}.txt", filename);
-		fs::path target(path);
+		fs::path target = std::format("Data\\SKSE\\Plugins\\SkyRegEx\\{}.txt", filename);
 		if (fs::exists(target)) {
 			std::ifstream input(target);
 			std::string strN;

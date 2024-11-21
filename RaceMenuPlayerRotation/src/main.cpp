@@ -1,6 +1,3 @@
-#include <spdlog/sinks/basic_file_sink.h>
-#include <spdlog/sinks/msvc_sink.h>
-
 #include "hpp/process.hpp"
 
 void InitLogging(std::string pattern) {
@@ -33,7 +30,7 @@ SKSEPluginLoad(const SKSE::LoadInterface* a_skse) {
 	);
 
 	// done
-	InitMessaging();
 	ROTConfig::LoadConfig();
+	InitMessaging();
 	return true;
 }

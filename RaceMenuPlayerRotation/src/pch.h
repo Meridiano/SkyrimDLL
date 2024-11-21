@@ -9,4 +9,4 @@ namespace stl = SKSE::stl;
 using namespace std::literals;
 
 // my own includes
-#include "mini/ini.h"
+#include "../lib/mini/ini.h"

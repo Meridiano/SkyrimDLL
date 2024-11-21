@@ -59,8 +59,7 @@ namespace CamFolConsole {
 
 	void Register(SKSE::MessagingInterface::Message* a_msg) {
 		if (a_msg->type == SKSE::MessagingInterface::kDataLoaded) {
-			bool com = RegisterCF();
-			logs::info("{}", com ? "Console commands registered" : "Could not register console commands");
+			logs::info("{}", RegisterCF() ? "Console commands registered" : "Could not register console commands");
 			CamFolHooks::FillPointers();
 		}
 	}

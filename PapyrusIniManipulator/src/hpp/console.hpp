@@ -21,12 +21,12 @@ namespace PIMConsole {
 		std::string path = arguments[0];
 		std::string section = arguments[1];
 		std::string key = arguments[2];
-		ConsolePrint(std::format("    Path = {}\n    Section = {}\n    Key = {}", path, section, key));
+		ConsolePrint(std::format("{}Path = {}\n{}Section = {}\n{}Key = {}", tab, path, tab, section, tab, key));
 		if (PIMInternal::IniDataExistsInternal(2, path, section, key)) {
-			ConsolePrint(std::format("        Value = {}", PIMInternal::PullStringFromIniInternal(path, section, key, "")));
+			ConsolePrint(d_tab + "Value = " + PIMInternal::PullStringFromIniInternal(path, section, key, ""));
 			return true;
 		}
-		ConsolePrint("        Could not find this path/section/key.");
+		ConsolePrint(d_tab + "Could not find this path / section / key.");
 		return false;
 	}
 
@@ -42,17 +42,18 @@ namespace PIMConsole {
 		std::string key = arguments[2];
 		std::string value = arguments[3];
 		bool force = PIMUtility::StringToBool(arguments[4], false);
-		ConsolePrint(std::format("    Path = {}\n    Section = {}\n    Key = {}\n    Value = {}\n    Force = {}", path, section, key, value, force));
+		ConsolePrint(std::format("{}Path = {}\n{}Section = {}\n{}Key = {}\n{}Value = {}\n{}Force = {}", tab, path, tab, section, tab, key, tab, value, tab, force));
 		if (PIMInternal::IniDataExistsInternal(2, path, section, key) || force) {
 			bool result = PIMInternal::PushStringToIniInternal(path, section, key, value, force);
 			if (result) {
-				ConsolePrint("        Value has been pushed successfully.");
+				ConsolePrint(d_tab + "Value has been pushed successfully.");
 				return true;
 			}
-			ConsolePrint("        Could not push value to this path/section/key.");
+			ConsolePrint(d_tab + "Could not push value to this path/section/key.");
 			return false;
 		}
-		ConsolePrint("        Could not find this path/section/key.\n        Push without force canceled.");
+		ConsolePrint(d_tab + "Could not find this path/section/key.");
+		ConsolePrint(d_tab + "Push without force canceled.");
 		return false;
 	}
 

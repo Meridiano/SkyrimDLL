@@ -1,6 +1,3 @@
-#include <spdlog/sinks/basic_file_sink.h>
-#include <spdlog/sinks/msvc_sink.h>
-
 #include "hpp/hooks.hpp"
 
 void InitLogging(std::string pattern) {
