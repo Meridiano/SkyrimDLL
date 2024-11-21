@@ -26,7 +26,7 @@ namespace PIMConsole {
 			ConsolePrint(d_tab + "Value = " + PIMInternal::PullStringFromIniInternal(path, section, key, ""));
 			return true;
 		}
-		ConsolePrint(d_tab + "Could not find this path / section / key.");
+		ConsolePrint(d_tab + "Could not find this path/section/key.");
 		return false;
 	}
 
