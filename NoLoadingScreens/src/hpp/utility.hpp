@@ -20,21 +20,19 @@ namespace NLSUtility {
 	};
 
 	std::string SourceFilenameLower(RE::TESForm* form, RE::TESDataHandler* data) {
+		auto LowerName = [](const RE::TESFile* f) {
+			auto n = (f ? f->fileName : "");
+			return StringToLower(n);
+		};
 		if (form && data) {
 			std::uint8_t space = (form->formID >> 24);
 			if (space == 0xFE) {
 				std::uint16_t light = (form->formID >> 12) & 0xFFF;
 				auto file = data->LookupLoadedLightModByIndex(light);
-				if (file) {
-					auto name = std::string(file->fileName);
-					return StringToLower(name);
-				}
+				return LowerName(file);
 			} else if (space != 0xFF) {
 				auto file = data->LookupLoadedModByIndex(space);
-				if (file) {
-					auto name = std::string(file->fileName);
-					return StringToLower(name);
-				}
+				return LowerName(file);
 			}
 		}
 		return "";
