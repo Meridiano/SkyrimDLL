@@ -11,6 +11,8 @@ namespace PIMConsole {
 		}
 	}
 
+	#define ConLog(fmt, ...) ConsolePrint(std::format(fmt, __VA_ARGS__))
+
 	bool ExecutePVFI(const RE::SCRIPT_PARAMETER*, RE::SCRIPT_FUNCTION::ScriptData* a_scriptData, RE::TESObjectREFR*, RE::TESObjectREFR*, RE::Script*, RE::ScriptLocals*, double&, std::uint32_t&) {
 		std::vector<std::string> arguments(3, "");
 		auto stringChunk = a_scriptData->GetStringChunk();
@@ -21,12 +23,12 @@ namespace PIMConsole {
 		std::string path = arguments[0];
 		std::string section = arguments[1];
 		std::string key = arguments[2];
-		ConsolePrint(std::format("{}Path = {}\n{}Section = {}\n{}Key = {}", tab, path, tab, section, tab, key));
+		ConLog("{}Path = {}\n{}Section = {}\n{}Key = {}", tab, path, tab, section, tab, key);
 		if (PIMInternal::IniDataExistsInternal(2, path, section, key)) {
-			ConsolePrint(d_tab + "Value = " + PIMInternal::PullStringFromIniInternal(path, section, key, ""));
+			ConLog("{}Value = {}", d_tab, PIMInternal::PullStringFromIniInternal(path, section, key, ""));
 			return true;
 		}
-		ConsolePrint(d_tab + "Could not find this path/section/key.");
+		ConLog("{}Could not find this path/section/key.", d_tab);
 		return false;
 	}
 
@@ -42,20 +44,21 @@ namespace PIMConsole {
 		std::string key = arguments[2];
 		std::string value = arguments[3];
 		bool force = PIMUtility::StringToBool(arguments[4], false);
-		ConsolePrint(std::format("{}Path = {}\n{}Section = {}\n{}Key = {}\n{}Value = {}\n{}Force = {}", tab, path, tab, section, tab, key, tab, value, tab, force));
+		ConLog("{}Path = {}\n{}Section = {}\n{}Key = {}\n{}Value = {}\n{}Force = {}", tab, path, tab, section, tab, key, tab, value, tab, force);
 		if (PIMInternal::IniDataExistsInternal(2, path, section, key) || force) {
 			bool result = PIMInternal::PushStringToIniInternal(path, section, key, value, force);
 			if (result) {
-				ConsolePrint(d_tab + "Value has been pushed successfully.");
+				ConLog("{}Value has been pushed successfully.", d_tab);
 				return true;
 			}
-			ConsolePrint(d_tab + "Could not push value to this path/section/key.");
+			ConLog("{}Could not push value to this path/section/key.", d_tab);
 			return false;
 		}
-		ConsolePrint(d_tab + "Could not find this path/section/key.");
-		ConsolePrint(d_tab + "Push without force canceled.");
+		ConLog("{}Could not find this path/section/key.\n{}Push without force canceled.", d_tab, d_tab);
 		return false;
 	}
+
+	#undef ConLog
 
 	bool RegisterPVFI() {
 		std::string toSteal = PIMInternal::PullStringFromIniInternal(PIMUtility::PluginConfigPath(), "Console", "sConsoleCommandToStealA", "StartTrackPlayerDoors");
