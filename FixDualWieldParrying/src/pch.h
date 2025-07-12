@@ -9,3 +9,4 @@ using namespace std::literals;
 
 #include "../lib/okdshin/picosha2.h"
 #define FindModule(S) reinterpret_cast<std::uintptr_t>(REX::W32::GetModuleHandleW(L#S))
+#define HashEqual(S1,S2) (S1.size() == 64) && (S1.compare(S2) == 0)

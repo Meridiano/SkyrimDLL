@@ -23,7 +23,7 @@ void MessageListener(SKSE::MessagingInterface::Message* msg) {
 		auto ngModule = FindModule(DualWieldParryingNG);
 		if (ngModule) {
 			auto sha256 = CalculateHash("Data/SKSE/Plugins/DualWieldParryingNG.dll");
-			bool match = (sha256.size() == 64) && (sha256.compare("4a401832814a043009f9ca7cc724da0531674a10556c3f4aa98292df19dc6ed2") == 0);
+			bool match = HashEqual(sha256, "4a401832814a043009f9ca7cc724da0531674a10556c3f4aa98292df19dc6ed2");
 			if (match) {
 				WriteValue<std::uint8_t>(REL::Relocation{ ngModule + 0x4F343 }, 0xF);
 				ngPatched = true;
@@ -33,7 +33,7 @@ void MessageListener(SKSE::MessagingInterface::Message* msg) {
 		auto ogModule = FindModule(DualWieldParryingSKSE);
 		if (ogModule) {
 			auto sha256 = CalculateHash("Data/SKSE/Plugins/DualWieldParryingSKSE.dll");
-			bool match = (sha256.size() == 64) && (sha256.compare("584f6f32d5a8bc941220486c5d64653cd1a193d2903b04e9ba6e40506289964a") == 0);
+			bool match = HashEqual(sha256, "584f6f32d5a8bc941220486c5d64653cd1a193d2903b04e9ba6e40506289964a");
 			if (match) {
 				WriteValue<std::uint32_t>(REL::Relocation{ ogModule + 0x5AB2 }, 0x100);
 				ogPatched = true;
