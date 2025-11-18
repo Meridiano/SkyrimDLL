@@ -1,6 +1,6 @@
 template<typename Func>
-auto WriteFunctionHook(std::uint64_t id, std::size_t copyCount, Func destination) {
-	const auto target = REL::ID(id).address();
+auto WriteFunctionHook(REL::VariantID id, std::size_t copyCount, Func destination) {
+	const auto target = REL::Relocation(id).address();
 	struct XPatch: Xbyak::CodeGenerator {
 		using ull = unsigned long long;
 		using uch = unsigned char;
@@ -40,8 +40,8 @@ void PrintIniSetting(std::string arg, T val) {
 }
 
 class GetSetHooks {
-	static const std::uint64_t getID = 22033;
-	static const std::uint64_t setID = 22034;
+	static inline REL::VariantID getID{ 21551, 22033, 0x303CD0 };
+	static inline REL::VariantID setID{ 21552, 22034, 0x303EE0 };
 	std::vector<std::string> dataHolder;
 private:
 	static decltype(dataHolder)& GetStorage() {
@@ -82,11 +82,10 @@ private:
 								case 's':
 								case 'S':
 									auto StoreNextValue = [](RE::SCRIPT_FUNCTION::StringChunk* chunk) {
-										std::string data = std::string();
-										try { data = chunk->GetNext()->AsString()->GetString(); }
-										catch (...) { /* lmao, okay */ }
+										auto data = chunk->GetNext()->AsString()->GetString();
+										auto index = GetStorage().size();
 										GetStorage().push_back(data);
-										return (GetStorage().size() - 1);
+										return index;
 									};
 									setting->data.s = GetStorage()[StoreNextValue(stringChunk)].data();
 									PrintIniSetting(argument, setting->GetString());
@@ -103,10 +102,10 @@ private:
 public:
 	static bool Install() {
 		// get
-		auto getAddress = REL::ID(getID).address();
+		auto getAddress = REL::Relocation(getID).address();
 		bool getMatchJump = REL::make_pattern<"E9">().match(getAddress);
 		bool getMatchCustom = REL::make_pattern<"48 81 EC 48 02 00 00">().match(getAddress);
-		auto getInfo = std::format("REL::ID({}) function (Get)", getID);
+		auto getInfo = std::format("Get function offset = {:X}", getID.offset());
 		if (getMatchJump) {
 			// my hook is not the first
 			FunctionGet::Original = TRAMPOLINE.write_branch<5>(getAddress, FunctionGet::Modified);
@@ -119,10 +118,10 @@ public:
 			logs::info("{} / Failed to match any pattern", getInfo);
 		}
 		// set
-		auto setAddress = REL::ID(setID).address();
+		auto setAddress = REL::Relocation(setID).address();
 		bool setMatchJump = REL::make_pattern<"E9">().match(setAddress);
 		bool setMatchCustom = REL::make_pattern<"48 81 EC 58 04 00 00">().match(setAddress);
-		auto setInfo = std::format("REL::ID({}) function (Set)", setID);
+		auto setInfo = std::format("Set function offset = {:X}", setID.offset());
 		if (setMatchJump) {
 			// my hook is not the first
 			FunctionSet::Original = TRAMPOLINE.write_branch<5>(setAddress, FunctionSet::Modified);
@@ -150,15 +149,15 @@ void MessageListener(SKSE::MessagingInterface::Message* a_msg) {
 SKSEPluginLoad(const SKSE::LoadInterface* a_skse) {
 	SKSE::Init(a_skse, true);
 
-	const auto gameVersion = a_skse->RuntimeVersion();
+	auto module = &REL::Module::get();
+	auto se = module->IsSE();
+	auto ae = module->IsAE();
+	auto vr = module->IsVR();
 	logs::info(
-		"Skyrim SE/AE v{}",
-		gameVersion.string("-")
+		"Skyrim {} v{}",
+		se ? "SE" : ae ? "AE" : vr ? "VR" : "??",
+		module->version().string("-")
 	);
-
-	if (gameVersion.patch() < 1130) {
-		SKSE::stl::report_and_fail("Patch version 1130 or higher is required");
-	}
 
 	const auto messagingInterface = SKSE::GetMessagingInterface();
 	if (messagingInterface && messagingInterface->RegisterListener(MessageListener)) {

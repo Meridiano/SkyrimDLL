@@ -7,7 +7,7 @@ add_requires("xbyak")
 
 -- set project
 set_project("GetIniConsoleFix")
-set_version("1.0.1")
+set_version("1.1.0")
 set_license("MIT")
 
 -- set defaults
@@ -22,8 +22,6 @@ add_rules("mode.debug", "mode.releasedbg")
 add_rules("plugin.vsxmake.autoupdate")
 
 -- set configs
-set_config("skyrim_se", false)
-set_config("skyrim_vr", false)
 set_config("mode", "releasedbg")
 
 -- targets
