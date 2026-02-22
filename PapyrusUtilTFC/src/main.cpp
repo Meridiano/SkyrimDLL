@@ -65,7 +65,7 @@ bool PapyrusOverride(RE::BSScript::IVirtualMachine* a_vm) {
 
 void MessageListener(SKSE::MessagingInterface::Message* a_msg) {
 	if (a_msg->type == SKSE::MessagingInterface::kPostPostLoad) {
-		auto papyrusUtil = FindModule(PapyrusUtil);
+		auto papyrusUtil = FindModule(L"PapyrusUtil");
 		if (papyrusUtil) {
 			const auto papInterface = SKSE::GetPapyrusInterface();
 			if (papInterface) papInterface->Register(PapyrusOverride);

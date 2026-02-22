@@ -7,6 +7,6 @@ namespace logs = SKSE::log;
 using namespace std::literals;
 namespace fs = std::filesystem;
 
-#define FindModule(S) reinterpret_cast<std::uintptr_t>(REX::W32::GetModuleHandleW(L#S))
+#define FindModule(S) reinterpret_cast<std::uintptr_t>(REX::W32::GetModuleHandleW(S))
 #undef min
 #undef max
