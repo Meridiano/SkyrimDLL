@@ -20,11 +20,10 @@ jobs:
       - name: Set Variables
         shell: pwsh
         run: |
-          $Projects = "${{ inputs.projects }}".Split(":") | Where-Object { Test-Path $PSItem } | ConvertTo-Json -Compress
-          If ($Projects.Length -eq 0) {
-            Write-Host "No projects to build"
-            Exit 1
-          }
+          $Projects = "${{ inputs.projects }}"
+          If ($Projects -eq "<ALL>") { $Projects = (Get-ChildItem -Directory | Where-Object { Test-Path "$PSItem/xmake.lua" }).Name -Join ":" }
+          $Projects = $Projects.Split(":") | Where-Object { Test-Path $PSItem } | ConvertTo-Json -Compress
+          If ($Projects.Length -eq 0) { Write-Host "No projects to build" ; Exit 1 }
           $Timestamp = Get-Date -UFormat "%s"
           echo "PROJECTS=$Projects" | Out-File -FilePath $Env:GITHUB_ENV -Append
           echo "TIMESTAMP=$Timestamp" | Out-File -FilePath $Env:GITHUB_ENV -Append
@@ -57,6 +56,10 @@ jobs:
           ForEach ($Project in $Env:PROJECTS | ConvertFrom-Json) {
             Get-ChildItem -Recurse -Filter "$Project.dll" | Copy-Item -Destination $Env:OUTPUT
             Get-ChildItem -Recurse -Filter "$Project.pdb" | Copy-Item -Destination $Env:OUTPUT
+          }
+          Get-ChildItem $Env:OUTPUT -File -Recurse | ForEach-Object {
+            $Hash = Get-FileHash $PSItem -Algorithm SHA256
+            Write-Host "$($Hash.Hash) = $($Hash.Path)"
           }
       - name: Upload Artifacts
         uses: actions/upload-artifact@main
