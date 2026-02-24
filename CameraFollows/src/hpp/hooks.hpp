@@ -10,22 +10,28 @@ namespace CamFolHooks {
 	RE::PlayerCharacter* pPlayer = nullptr;
 	RE::VATS* pVATS = nullptr;
 
-	class UpdatePCHook {
+	class UpdateDataHook {
+	private:
+		static std::size_t UpdateDataMod(RE::NiAVObject* object, RE::NiUpdateData* data) {
+			if (object && data) {
+				if (pCamera && pControls && pUserInterface && pPlayer && pVATS)
+					if (CamFolUtility::ProcessConditions(pCamera, pControls, pUserInterface, pPlayer, pVATS))
+						if (CamFolUtility::UpdateCamera(object, pCamera, pPlayer)) {
+							data->flags = RE::NiUpdateData::Flag::kDirty;
+							data->time = 0.0F;
+						}
+			}
+			return UpdateData(object, data);
+		}
+		static inline REL::Relocation<decltype(UpdateDataMod)> UpdateData;
 	public:
 		static void Install() {
-			REL::Relocation pcVTable{ RE::VTABLE_PlayerCharacter[0] };
-			UpdatePC = pcVTable.write_vfunc(0xAD, UpdatePCMod);
-			logs::info("New UpdatePC hook installed");
+			auto id = REL::RelocationID(68900, 70251, 68900).id();
+			// push rbx = 40 53
+			// sub rsp, 20h = 48 83 EC 20
+			UpdateData = CamFolUtility::WriteFunctionHook(id, 6, UpdateDataMod);
+			logs::info("New UpdateData hook installed");
 		}
-	private:
-		static void UpdatePCMod(RE::PlayerCharacter* pc, float delta) {
-			// call original function
-			UpdatePC(pc, delta);
-
-			// do my stuff
-			if (CamFolUtility::ProcessConditions(pCamera, pControls, pUserInterface, pPlayer, pVATS)) CamFolUtility::UpdateCamera(pCamera, pPlayer);
-		}
-		static inline REL::Relocation<decltype(UpdatePCMod)> UpdatePC;
 	};
 
 	void FillPointers() {

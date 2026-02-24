@@ -3,10 +3,11 @@ set_xmakever("2.8.2")
 
 -- includes
 includes("lib/commonlibsse-ng")
+add_requires("xbyak")
 
 -- set project
 set_project("CameraFollows")
-set_version("1.5.7")
+set_version("1.6.0")
 set_license("MIT")
 
 -- set defaults
@@ -28,6 +29,7 @@ set_config("mode", "releasedbg")
 target("CameraFollows")
     -- add dependencies to target
     add_deps("commonlibsse-ng")
+    add_packages("xbyak")
 
     -- add commonlibsse-ng plugin
     add_rules("commonlibsse-ng.plugin", {

@@ -21,19 +21,21 @@ SKSEPluginLoad(const SKSE::LoadInterface* a_skse) {
 
 	// info
 	const auto plugin = SKSE::PluginDeclaration::GetSingleton();
+	std::string pluginName{ plugin->GetName() };
 	logs::info(
 		"{} version {} is loading into {}",
-		plugin->GetName(),
+		pluginName,
 		plugin->GetVersion().string("."),
 		REL::Module::get().version().string(".")
 	);
 
 	// stuff
 	InitMessaging();
-	CamFolUtility::ReadConfig(plugin);
-	CamFolHooks::UpdatePCHook::Install();
+	CamFolUtility::ReadConfig(pluginName);
+	SKSE::AllocTrampoline(64);
+	CamFolHooks::UpdateDataHook::Install();
 
 	// done
-	logs::info("{} plugin was loaded", plugin->GetName());
+	logs::info("{} plugin was loaded", pluginName);
 	return true;
 }

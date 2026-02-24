@@ -11,3 +11,5 @@ using namespace std::literals;
 #include "../lib/mini/ini.h"
 #include "../lib/nlohmann/json.hpp"
 using JSON = nlohmann::json;
+#include "xbyak/xbyak.h"
+#define TRAMPOLINE SKSE::GetTrampoline()
