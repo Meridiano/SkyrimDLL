@@ -6,7 +6,7 @@ includes("lib/commonlibsse-ng")
 
 -- set project
 set_project("PapyrusIniManipulator")
-set_version("1.9.7")
+set_version("1.9.8")
 set_license("MIT")
 
 -- set defaults

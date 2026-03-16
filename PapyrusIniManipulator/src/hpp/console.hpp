@@ -11,15 +11,21 @@ namespace PIMConsole {
 		}
 	}
 
-	#define ConLog(fmt, ...) ConsolePrint(std::format(fmt, __VA_ARGS__))
-
-	bool ExecutePVFI(const RE::SCRIPT_PARAMETER*, RE::SCRIPT_FUNCTION::ScriptData* a_scriptData, RE::TESObjectREFR*, RE::TESObjectREFR*, RE::Script*, RE::ScriptLocals*, double&, std::uint32_t&) {
-		std::vector<std::string> arguments(3, "");
+	auto GetStringArguments(RE::SCRIPT_FUNCTION::ScriptData* a_scriptData, std::uint16_t a_size) {
+		std::vector<std::string> arguments;
 		auto stringChunk = a_scriptData->GetStringChunk();
-		for (int index = 0; index < a_scriptData->numParams; index++) {
-			arguments[index] = stringChunk->GetString();
+		for (std::uint16_t index = 0; index < a_scriptData->numParams; index++) {
+			arguments.push_back(stringChunk->GetString());
 			stringChunk = stringChunk->GetNext()->AsString();
 		}
+		arguments.resize(a_size, "");
+		return arguments;
+	}
+
+	#define ConLog(...) ConsolePrint(std::format(__VA_ARGS__))
+
+	bool ExecutePVFI(const RE::SCRIPT_PARAMETER*, RE::SCRIPT_FUNCTION::ScriptData* a_scriptData, RE::TESObjectREFR*, RE::TESObjectREFR*, RE::Script*, RE::ScriptLocals*, double&, std::uint32_t&) {
+		auto arguments = GetStringArguments(a_scriptData, 3);
 		std::string path = arguments[0];
 		std::string section = arguments[1];
 		std::string key = arguments[2];
@@ -33,12 +39,7 @@ namespace PIMConsole {
 	}
 
 	bool ExecutePVTI(const RE::SCRIPT_PARAMETER*, RE::SCRIPT_FUNCTION::ScriptData* a_scriptData, RE::TESObjectREFR*, RE::TESObjectREFR*, RE::Script*, RE::ScriptLocals*, double&, std::uint32_t&) {
-		std::vector<std::string> arguments(5, "");
-		auto stringChunk = a_scriptData->GetStringChunk();
-		for (int index = 0; index < a_scriptData->numParams; index++) {
-			arguments[index] = stringChunk->GetString();
-			stringChunk = stringChunk->GetNext()->AsString();
-		}
+		auto arguments = GetStringArguments(a_scriptData, 5);
 		std::string path = arguments[0];
 		std::string section = arguments[1];
 		std::string key = arguments[2];
