@@ -42,20 +42,20 @@ namespace PIMUtility {
 		fs::path target(path);
 		if (fs::exists(target)) return true;
 		if (create) {
-			fs::path target_root = target.root_path();
-			fs::path target_parent = target.parent_path();
-			if (target_root.compare(target_parent) != 0) // need to create folders
-			{
-				if (!target_root.string().empty() && !fs::exists(target_root)) // path is absolute but local drive not found
-				{
+			fs::path targetRoot = target.root_path();
+			fs::path targetParent = target.parent_path();
+			if (targetRoot.compare(targetParent) != 0) {
+				// need to check folders
+				if (!targetRoot.string().empty() && !fs::exists(targetRoot)) {
+					// path is absolute but local drive not found
 					return false;
 				}
-				if (!fs::create_directories(target_parent)) // could not create folders
-				{
+				if (!fs::exists(targetParent) && !fs::create_directories(targetParent)) {
+					// failed to create required folders
 					return false;
 				}
 			}
-			std::ofstream file(path);
+			std::ofstream file(target);
 			file << "";
 			file.close();
 			return fs::exists(target);
