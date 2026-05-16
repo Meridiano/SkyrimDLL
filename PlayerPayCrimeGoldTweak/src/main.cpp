@@ -10,7 +10,7 @@ public:
 		static void Install() {
 			logs::info("Installing PlayerPayCrimeGold hook...");
 			REL::Relocation playerCharacterVTable{ RE::VTABLE_PlayerCharacter[0] };
-			PlayerPayCrimeGold = playerCharacterVTable.write_vfunc(0xBB, PlayerPayCrimeGoldMod);
+			PlayerPayCrimeGold = playerCharacterVTable.write_vfunc(REL::Relocate(0xBB, 0xBB, 0xBD), PlayerPayCrimeGoldMod);
 			logs::info("Done!");
 		}
 	private:
@@ -29,7 +29,7 @@ public:
 			SI_Error iniResult = ini.LoadFile(iniPath.data());
 			// read ini
 			if (iniResult < 0) {
-				logs::info("Settings file not found, input values: {} / {} / {}", goToJail, removeStolenItems, payCrimeGold);
+				logs::info("Settings file error, input values: {} / {} / {}", goToJail, removeStolenItems, payCrimeGold);
 			} else {
 				// get settings
 				int goToJailMode = ini.GetLongValue("Modes", "GoToJailMode", 0);

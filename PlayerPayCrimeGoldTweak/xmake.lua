@@ -6,7 +6,7 @@ includes("lib/commonlibsse-ng")
 
 -- set project
 set_project("PlayerPayCrimeGoldTweak")
-set_version("1.0.6")
+set_version("1.0.7")
 set_license("MIT")
 
 -- set defaults
