@@ -57,7 +57,7 @@ private:
 							switch (argument[0]) {
 								case 'u':
 								case 'U':
-									PrintIniSetting(argument, setting->GetUInt());
+									PrintIniSetting(argument, setting->GetUnsignedInteger());
 									return true;
 								case 's':
 								case 'S':
