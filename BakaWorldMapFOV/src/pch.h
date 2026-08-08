@@ -8,5 +8,6 @@ using namespace std::literals;
 namespace fs = std::filesystem;
 
 // custom things
+#define NOMINMAX
 #include "SimpleIni.h"
 #define CameraData2 camera->GetRuntimeData2()
