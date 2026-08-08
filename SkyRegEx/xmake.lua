@@ -21,7 +21,7 @@ add_rules("plugin.vsxmake.autoupdate")
 set_policy("package.requires_lock", true)
 
 -- add libs
-add_requires("pcre2", { configs = { bitwidth = 16 } })
+add_requires("pcre2", { configs = { bitwidth = "16" } })
 
 -- set configs
 set_config("skyrim_vr", true)
