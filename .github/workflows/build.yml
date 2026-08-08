@@ -49,7 +49,7 @@ jobs:
       - name: Setup CommonLib
         shell: pwsh
         run: |
-          git submodule add -b ng https://github.com/alandtse/CommonLibVR.git lib/commonlibsse-ng
+          git submodule add -b ng https://github.com/alandtse/CommonLibSSE-NG.git lib/commonlibsse-ng
           git submodule update --init --remote --recursive
           New-Item -ItemType Directory -Path "${{ matrix.project }}/lib"
           New-Item -ItemType Junction -Path "${{ matrix.project }}/lib/commonlibsse-ng" -Value (Get-Item "lib/commonlibsse-ng").FullName
@@ -102,8 +102,7 @@ jobs:
             [Void]$HashList.Add($HashInfo)
             Write-Host $HashInfo
           }
-          [Void]$HashList.Add("``````")
-          $HashList | Out-File "SHA256.md" -Encoding UTF8
+          [Void]$HashList.Add("``````") ; $HashList | Out-File "SHA256.md"
           Compress-Archive "$Root/*" "build-${{ needs.setup.outputs.timestamp }}.zip"
       - name: Upload Artifacts
         uses: actions/upload-artifact@main

@@ -8,7 +8,7 @@ add_requires("xbyak")
 -- set project
 set_project("CameraFollows")
 set_version("1.6.0")
-set_license("MIT")
+set_license("GPL-3.0")
 
 -- set defaults
 set_languages("c++23")
