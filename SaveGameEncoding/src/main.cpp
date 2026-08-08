@@ -87,7 +87,7 @@ namespace SGEProcess {
 					SGEUtility::RenameSaveFiles(savePath, sksePath);
 					SGEUtility::DisableUpdate();
 				} else attempt += 1;
-				if (attempt > 30) SGEUtility::DisableUpdate();
+				if (attempt > 60) SGEUtility::DisableUpdate();
 			}
 			// call original function
 			OnUpdate();

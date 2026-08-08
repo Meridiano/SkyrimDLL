@@ -7,7 +7,7 @@ includes("lib/commonlibsse-ng")
 -- set project
 set_project("RaceMenuPlayerRotation")
 set_version("1.2.2")
-set_license("MIT")
+set_license("GPL-3.0")
 
 -- set defaults
 set_languages("c++23")
