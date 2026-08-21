@@ -12,4 +12,5 @@ using namespace std::literals;
 #include "../lib/nlohmann/json.hpp"
 using JSON = nlohmann::json;
 #include "xbyak/xbyak.h"
+#define MODULE REL::Module::get()
 #define TRAMPOLINE SKSE::GetTrampoline()

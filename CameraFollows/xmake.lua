@@ -7,7 +7,7 @@ add_requires("xbyak")
 
 -- set project
 set_project("CameraFollows")
-set_version("1.6.0")
+set_version("1.6.1")
 set_license("GPL-3.0")
 
 -- set defaults
