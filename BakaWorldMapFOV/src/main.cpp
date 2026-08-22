@@ -1,20 +1,17 @@
 float GetConfigValue(std::string world) {
-	// resolve config
-	std::string config = "Data/SKSE/Plugins/BakaWorldMapFOV";
+	static std::string config = "Data/SKSE/Plugins/BakaWorldMapFOV";
 	auto configCustom = std::format("{}.{}.ini", config, world);
-	if (fs::exists(configCustom)) config = configCustom;
-	else config = std::format("{}.ini", config);
-	// resolve value
-	CSimpleIniA ini;
-	ini.SetUnicode();
-	SI_Error iniResult = ini.LoadFile(config.data());
-	return static_cast<float>(
-		iniResult < 0 ? 80.0 : ini.GetDoubleValue("General", "fWorldMapFOV", 80.0)
-	);
+	static auto configBase = std::format("{}.ini", config);
+	auto ReadFloat = [](std::string path, float old) {
+		CSimpleIniA ini;
+		ini.SetUnicode();
+		if (ini.LoadFile(path.data()) < 0) return old;
+		return static_cast<float>(ini.GetDoubleValue("General", "fWorldMapFOV", old));
+	};
+	return ReadFloat(configCustom, ReadFloat(configBase, 80.0F));
 }
 
-class EventHandler:
-	public RE::BSTEventSink<RE::MenuOpenCloseEvent> {
+class EventHandler : public RE::BSTEventSink<RE::MenuOpenCloseEvent> {
 private:
 	inline static auto defaultWorldFOV = 80.0F;
 	inline static auto defaultFirstFOV = 80.0F;
@@ -27,7 +24,7 @@ public:
 		if (auto handler = GetSingleton(); handler) {
 			if (auto ui = RE::UI::GetSingleton(); ui) {
 				ui->AddEventSink<RE::MenuOpenCloseEvent>(handler);
-				logs::info("Added MenuOpenCloseEvent Handler");
+				logs::info("Added MenuOpenCloseEvent Sink");
 			}
 		}
 	}

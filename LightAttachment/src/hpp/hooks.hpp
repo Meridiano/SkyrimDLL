@@ -10,9 +10,12 @@ namespace LiAtHooks {
 	class UpdateHook {
 	public:
 		static void Install() {
-			auto address = REL::VariantID(35565, 36564, 0x5BAB10).address();
-			auto offset = REL::VariantOffset(0x748, 0xC26, 0x7EE).offset();
-			OnUpdate = SKSE::GetTrampoline().write_call<5>(address + offset, OnUpdateMod);
+			std::uint32_t aeOffset = MODULE.version().minor() == 7 ? 0xC38 : 0xC26;
+			REL::Relocation target{
+				REL::VariantID(35565, 36564, 0x5BAB10),
+				REL::VariantOffset(0x748, aeOffset, 0x7EE)
+			};
+			OnUpdate = target.write_call<5>(OnUpdateMod);
 			logs::info("Update hook installed");
 		}
 	private:
@@ -37,7 +40,6 @@ namespace LiAtHooks {
 			player = RE::PlayerCharacter::GetSingleton();
 			if (player) logs::info("PlayerCharacter = {:X}", (std::uint64_t)player);
 			else stl::report_and_fail("Error: PlayerCharacter not found");
-			LiAtUtility::SetUpdateData();
 		} else return;
 	}
 

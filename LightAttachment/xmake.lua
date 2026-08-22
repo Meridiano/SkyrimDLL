@@ -6,7 +6,7 @@ includes("lib/commonlibsse-ng")
 
 -- set project
 set_project("LightAttachment")
-set_version("1.1.1")
+set_version("1.1.2")
 set_license("GPL-3.0")
 
 -- set defaults

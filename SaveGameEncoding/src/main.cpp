@@ -1,17 +1,18 @@
 namespace SGEStorage {
 
+	std::uint8_t attempt = 0;
 	fs::path savePath = "";
 	fs::path sksePath = "";
 	bool process = false;
-	BYTE attempt = 0;
 
 }
 
 namespace SGEUtility {
 
 	fs::path GetSavesDirectory() {
-		auto skyrimDirectory = logs::log_directory().value_or("").parent_path();
-		return skyrimDirectory / RE::GetINISetting("sLocalSavePath:General")->GetString();
+		auto logDir = logs::log_directory();
+		if (!logDir) stl::report_and_fail("Log path not found");
+		return logDir->parent_path() / RE::GetINISetting("sLocalSavePath:General")->GetString();
 	}
 
 	void RenameSaveFiles(fs::path savePath, fs::path sksePath) {
@@ -32,17 +33,17 @@ namespace SGEUtility {
 
 	void EnableUpdate(std::string save, std::string skse) {
 		SGEStorage::attempt = 0;
-		SGEStorage::process = true;
 		auto savesDirectory = GetSavesDirectory();
 		SGEStorage::savePath = (savesDirectory / save);
 		SGEStorage::sksePath = (savesDirectory / skse);
+		SGEStorage::process = true;
 	}
 
 	void DisableUpdate() {
-		SGEStorage::attempt = 0;
 		SGEStorage::process = false;
 		SGEStorage::savePath = "";
 		SGEStorage::sksePath = "";
+		SGEStorage::attempt = 0;
 	}
 
 }
@@ -52,13 +53,15 @@ namespace SGEProcess {
 	class SaveHook {
 	public:
 		static void InstallHook() {
-			auto address = REL::VariantID(34818, 35727, 0x58E310).address();
-			auto offset = REL::VariantOffset(0x112, 0x1CE, 0x116).offset();
-			SaveGameSub = SKSE::GetTrampoline().write_call<5>(address + offset, SaveGameSubMod);
+			REL::Relocation target{
+				REL::VariantID(34818, 35727, 0x58E310),
+				REL::VariantOffset(0x112, 0x1CE, 0x116)
+			};
+			SaveGameSub = target.write_call<5>(SaveGameSubMod);
 			logs::info("Save hook installed");
 		}
 	private:
-		static const char* SaveGameSubMod(RE::BGSSaveLoadManager* a1, void* a2, const char* a3, void* a4, std::int32_t a5) {
+		static const char* SaveGameSubMod(RE::BGSSaveLoadManager* a1, void* a2, const char* a3, std::int64_t a4, std::int32_t a5) {
 			// do my stuff
 			std::string save = std::format("{}.ess", a3);
 			std::string skse = std::format("{}.skse", a3);
@@ -72,22 +75,27 @@ namespace SGEProcess {
 	class UpdateHook {
 	public:
 		static void InstallHook() {
-			auto address = REL::VariantID(35565, 36564, 0x5BAB10).address();
-			auto offset = REL::VariantOffset(0x748, 0xC26, 0x7EE).offset();
-			OnUpdate = SKSE::GetTrampoline().write_call<5>(address + offset, OnUpdateMod);
+			std::uint32_t aeOffset = MODULE.version().minor() == 7 ? 0xC38 : 0xC26;
+			REL::Relocation target{
+				REL::VariantID(35565, 36564, 0x5BAB10),
+				REL::VariantOffset(0x748, aeOffset, 0x7EE)
+			};
+			OnUpdate = target.write_call<5>(OnUpdateMod);
 			logs::info("Update hook installed");
 		}
 	private:
 		static void OnUpdateMod() {
 			// do my stuff
-			using namespace SGEStorage;
-			if (process) {
-				if (fs::exists(savePath) && fs::exists(sksePath)) {
-					logs::info("RenameSaveFiles\n{}\n{}", savePath.string(), sksePath.string());
-					SGEUtility::RenameSaveFiles(savePath, sksePath);
+			if (SGEStorage::process) {
+				auto& it = SGEStorage::attempt;
+				auto& p1 = SGEStorage::savePath;
+				auto& p2 = SGEStorage::sksePath;
+				if (fs::exists(p1) && fs::exists(p2)) {
+					logs::info("RenameSaveFiles\n{}\n{}", p1.string(), p2.string());
+					SGEUtility::RenameSaveFiles(p1, p2);
 					SGEUtility::DisableUpdate();
-				} else attempt += 1;
-				if (attempt > 60) SGEUtility::DisableUpdate();
+				} else it += 1;
+				if (it > 60) SGEUtility::DisableUpdate();
 			}
 			// call original function
 			OnUpdate();
@@ -128,9 +136,9 @@ SKSEPluginLoad(const SKSE::LoadInterface* a_skse) {
 		"{} version {} is loading into {}",
 		plugin->GetName(),
 		plugin->GetVersion().string("."),
-		REL::Module::get().version().string(".")
+		MODULE.version().string(".")
 	);
 	
-	SKSE::AllocTrampoline(1024);
+	SKSE::AllocTrampoline(32);
 	return InitMessaging();
 }

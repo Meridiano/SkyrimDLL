@@ -25,7 +25,7 @@ SKSEPluginLoad(const SKSE::LoadInterface* a_skse) {
 		"{} version {} is loading into {}",
 		plugin->GetName(),
 		plugin->GetVersion().string("."),
-		REL::Module::get().version().string(".")
+		MODULE.version().string(".")
 	);
 
 	SKSE::AllocTrampoline(128);
