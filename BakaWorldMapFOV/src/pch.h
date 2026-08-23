@@ -10,4 +10,5 @@ namespace fs = std::filesystem;
 
 // custom things
 #include "SimpleIni.h"
+#define MapData2 map->GetRuntimeData2()
 #define CameraData2 camera->GetRuntimeData2()

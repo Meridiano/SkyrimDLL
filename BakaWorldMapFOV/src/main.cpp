@@ -33,9 +33,10 @@ public:
 			if (auto camera = RE::PlayerCamera::GetSingleton(); camera) {
 				if (a_event->opening) {
 					std::string edid = "DefaultWorld";
-					if (auto pc = RE::PlayerCharacter::GetSingleton(); pc)
-						if (auto world = pc->GetWorldspace(); world)
-							edid = world->GetFormEditorID();
+					if (auto ui = RE::UI::GetSingleton(); ui)
+						if (auto map = ui->GetMenu<RE::MapMenu>(RE::MapMenu::MENU_NAME).get(); map)
+							if (auto world = MapData2->worldSpace; world)
+								edid = world->GetFormEditorID();
 					// get
 					auto fWorldMapFOV = GetConfigValue(edid);
 					// save

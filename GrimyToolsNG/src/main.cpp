@@ -123,18 +123,16 @@ namespace GPNGInternal {
 				case 10:
 					result8 = theWeather->data.thunderLightningFrequency;
 					break;
-				case 11: {
+				case 11:
 					result8 = theWeather->data.flags.underlying();
 					break;
-				}
 				case 12: {
 					auto r = theWeather->data.lightningColor.red;
 					auto g = theWeather->data.lightningColor.green;
 					auto b = theWeather->data.lightningColor.blue;
 					result32 = ((r < 0 ? 255 : r) * 65536 + (g < 0 ? 255 : g) * 256 + (b < 0 ? 255 : b) * 1);
 					convert = false;
-					break;
-				}
+				}   break;
 				case 13:
 					result8 = theWeather->data.visualEffectBegin;
 					break;
@@ -210,15 +208,13 @@ namespace GPNGInternal {
 						(bPermAurora ? WDF::kPermAurora : WDF::kNone),
 						(bAuroraFollowsSun ? WDF::kAuroraFollowsSun : WDF::kNone)
 					);
-					break;
-				}
+				}   break;
 				case 12: {
 					value32 = (uint32_t)GPNGUtility::RestrictInt(value32, 0, 0xFFFFFF);
 					theWeather->data.lightningColor.red = (uint8_t)((value32 & 0xFF0000) >> 16);
 					theWeather->data.lightningColor.green = (uint8_t)((value32 & 0x00FF00) >> 8);
 					theWeather->data.lightningColor.blue = (uint8_t)((value32 & 0x0000FF) >> 0);
-					break;
-				}
+				}   break;
 				case 13:
 					theWeather->data.visualEffectBegin = value8;
 					break;
@@ -320,7 +316,10 @@ namespace GPNGInternal {
 	}
 
 	// spell - merger
-	int32_t MergeSpells(RE::SpellItem* outputSpell, std::vector<RE::SpellItem*> inputSpells, std::vector<float> magMults, std::vector<float> durMults, std::vector<float> costMults, float timeMult) {
+	int32_t MergeSpells(RE::SpellItem* outputSpell, std::vector<RE::SpellItem*> inputSpellsArgument, std::vector<float> magMults, std::vector<float> durMults, std::vector<float> costMults, float timeMult) {
+		// clear null spells
+		std::vector<RE::SpellItem*> inputSpells;
+		for (auto spell : inputSpellsArgument) if (spell) inputSpells.push_back(spell);
 		// check for sizes
 		auto isCount = inputSpells.size();
 		auto mmCount = magMults.size();
