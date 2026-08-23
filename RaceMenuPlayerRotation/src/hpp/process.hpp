@@ -21,7 +21,7 @@ namespace ROTProcess {
 			if (auto root = player->Get3D(false); root) {
 				angle.z += amount;
 				root->local.rotate.SetEulerAnglesXYZ(angle);
-				RE::NiUpdateData data;
+				RE::NiUpdateData data{ 0.0F, RE::NiUpdateData::Flag::kNone };
 				root->UpdateWorldData(&data);
 			}
 		}
@@ -29,19 +29,18 @@ namespace ROTProcess {
 		RE::BSEventNotifyControl ProcessEvent(RE::InputEvent* const* a_event, RE::BSTEventSource<RE::InputEvent*>* a_eventSource) {
 			reinterpret_cast<std::uint64_t>(a_eventSource);
 			if (!a_event) return RE::BSEventNotifyControl::kContinue;
-
+			// ui
 			auto ui = RE::UI::GetSingleton();
 			if (!ui || !ui->IsMenuOpen(RE::RaceSexMenu::MENU_NAME)) return RE::BSEventNotifyControl::kContinue;
-
+			// pc
 			auto player = RE::PlayerCharacter::GetSingleton();
 			if (!player || !player->Is3DLoaded()) return RE::BSEventNotifyControl::kContinue;
-
+			// process
 			for (auto event = *a_event; event; event = event->next) {
 				auto inputDevice = event->GetDevice();
 				switch (event->GetEventType()) {
 					// iterate event
-					case RE::INPUT_EVENT_TYPE::kButton:
-					{
+					case RE::INPUT_EVENT_TYPE::kButton: {
 						auto buttonEvent = event->AsButtonEvent();
 						if (buttonEvent && buttonEvent->IsHeld()) {
 							dxScanCode = ROTUtility::ButtonEventToDXScanCode(inputDevice, buttonEvent);
@@ -51,26 +50,21 @@ namespace ROTProcess {
 						}
 						// iterate device
 						switch (inputDevice) {
-							case RE::INPUT_DEVICE::kMouse:
-							{
+							case RE::INPUT_DEVICE::kMouse: {
 								if (ROTUtility::IsGamepadMode()) break;
 								if (dxScanCode == ROTConfig::iRegularButton) {
 									allowRotation = true;
 									continue;
 								}
-								break;
-							}
-							case RE::INPUT_DEVICE::kKeyboard:
-							{
+							}   break;
+							case RE::INPUT_DEVICE::kKeyboard: {
 								if (ROTUtility::IsGamepadMode()) break;
 								if (dxScanCode == ROTConfig::iRegularButton) {
 									allowRotation = true;
 									continue;
 								}
-								break;
-							}
-							case RE::INPUT_DEVICE::kGamepad:
-							{
+							}   break;
+							case RE::INPUT_DEVICE::kGamepad: {
 								if (ROTUtility::IsGamepadMode()) {
 									if (dxScanCode == ROTConfig::iGamepadButtonL) {
 										// rotate left
@@ -84,24 +78,19 @@ namespace ROTProcess {
 										continue;
 									}
 								}
-								break;
-							}
+							}   break;
 						}
-					}
-					continue;
-					case RE::INPUT_EVENT_TYPE::kMouseMove:
-					{
+					}   break;
+					case RE::INPUT_EVENT_TYPE::kMouseMove: {
 						if (!allowRotation) continue;
-
+						// check event
 						auto mouseEvent = reinterpret_cast<RE::MouseMoveEvent*>(event->AsIDEvent());
 						if (!mouseEvent) continue;
-
 						// calculate and rotate
 						auto mouseDeltaX = mouseEvent->mouseInputX;
 						float amount = mouseDeltaX == 0 ? 0.0F : (mouseDeltaX > 0 ? -1 : 1) * ROTConfig::fRotationAmount;
 						RotatePlayer(player, amount);
-					}
-					break;
+					}   break;
 				}
 			}
 			return RE::BSEventNotifyControl::kContinue;
