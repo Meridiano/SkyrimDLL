@@ -26,7 +26,7 @@ namespace PIMPapyrus {
 	}
 	
 	std::vector<std::string> GetIniData(RE::StaticFunctionTag* base, std::int32_t level, std::string path, std::string section, std::string key) {
-		return PIMInternal::GetIniDataInternal(level, path, section, key);;
+		return PIMInternal::GetIniDataInternal(level, path, section, key);
 	}
 	
 	std::string PullStringFromIni(RE::StaticFunctionTag* base, std::string path, std::string section, std::string key, std::string defaultValue) {
