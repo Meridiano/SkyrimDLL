@@ -50,8 +50,7 @@ namespace NLSConfig {
 	void LoadConfig() {
 		const auto path = std::format("Data/SKSE/Plugins/{}.ini", SKSE::GetPluginName());
 		mINI::INIFile file(path);
-		mINI::INIStructure ini;
-		if (file.read(ini)) {
+		if (mINI::INIStructure ini; file.read(ini)) {
 			sNewStatic = ConfigString(ini, "General", "sNewStatic", "");
 			sNewText = ConfigString(ini, "General", "sNewText", "");
 			iMode = ConfigUInt8(ini, "General", "iMode", 0);

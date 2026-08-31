@@ -7,3 +7,5 @@ namespace fs = std::filesystem;
 namespace logs = SKSE::log;
 namespace stl = SKSE::stl;
 using namespace std::literals;
+
+#define MODULE REL::Module::get()

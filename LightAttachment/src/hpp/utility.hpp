@@ -2,21 +2,15 @@
 
 namespace LiAtUtility {
 
-	static RE::NiUpdateData updateData;
-
-	void SetUpdateData() {
-		updateData.flags = RE::NiUpdateData::Flag::kDirty;
-		updateData.time = 0.0F;
-	}
+	static RE::NiUpdateData updateData{ 0.0F, RE::NiUpdateData::Flag::kDirty };
 
 	bool IsPC1stPerson() {
-		static auto cam = RE::PlayerCamera::GetSingleton();
-		static REL::Relocation<bool(*)(RE::PlayerCamera*, std::int64_t, std::int64_t, double*)> func{
-			REL::VariantID(21147, 21600, 0x2ED9A0)
-		};
-		double val = 0.0;
-		func(cam, 0, 0, &val);
-		return (val != 0.0);
+		static auto camera = RE::PlayerCamera::GetSingleton();
+		static auto id = REL::VariantID(21147, 21600, 0x2ED9A0);
+		static REL::Relocation<bool(*)(RE::PlayerCamera*, std::int64_t, std::int64_t, double*)> function{ id };
+		double value = 0.0;
+		function(camera, 0, 0, &value);
+		return (value != 0.0);
 	}
 
 	void GetObjectsByName(RE::NiAVObject* obj, RE::BSFixedString name, std::set<RE::NiAVObject*>& result) {
@@ -32,10 +26,8 @@ namespace LiAtUtility {
 		GetObjectsByName(player->Get3D(true), "AttachLight", lights);
 		for (auto light : lights) {
 			if (auto lightNode = light->AsNode(); lightNode) {
-				auto& lightChildren = lightNode->children;
-				if (lightChildren.size()) {
-					auto lightObject = lightChildren[0].get();
-					if (lightObject) {
+				if (auto& lightChildren = lightNode->children; lightChildren.size()) {
+					if (auto lightObject = lightChildren[0].get(); lightObject) {
 						// get node data
 						auto nodeT = lightNode->world.translate;
 						auto nodeS = lightNode->world.scale;

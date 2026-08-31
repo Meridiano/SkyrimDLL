@@ -1,6 +1,6 @@
 #pragma once
 
-#include "hpp/RE.hpp"
+#include "hpp/re.hpp"
 
 namespace Hooks {
 	//Crafting.h

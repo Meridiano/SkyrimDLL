@@ -6,7 +6,7 @@ includes("lib/commonlibsse-ng")
 
 -- set project
 set_project("ColinoshSKSE")
-set_version("1.0.0")
+set_version("1.0.1")
 set_license("GPL-3.0")
 
 -- set defaults

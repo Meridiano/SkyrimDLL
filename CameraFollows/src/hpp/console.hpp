@@ -12,16 +12,11 @@ namespace CamFolConsole {
 	}
 
 	bool ExecuteCF(const RE::SCRIPT_PARAMETER*, RE::SCRIPT_FUNCTION::ScriptData* a_scriptData, RE::TESObjectREFR*, RE::TESObjectREFR*, RE::Script*, RE::ScriptLocals*, double&, std::uint32_t&) {
-		int size = a_scriptData->numParams;
-		std::vector<std::string> arguments(1, "");
-		auto stringChunk = a_scriptData->GetStringChunk();
-		for (int index = 0; index < size; index++) {
-			arguments[index] = stringChunk->GetString();
-			stringChunk = stringChunk->GetNext()->AsString();
+		if (a_scriptData->numParams == 1) {
+			std::string data = a_scriptData->GetStringChunk()->GetString();
+			std::string info = CamFolUtility::SetProcessEnabled(data);
+			ConsolePrint(info);
 		}
-		std::string data = arguments[0];
-		std::string info = CamFolUtility::SetProcessEnabled(data);
-		ConsolePrint(info);
 		return true;
 	}
 

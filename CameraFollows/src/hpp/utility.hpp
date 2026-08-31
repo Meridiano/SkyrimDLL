@@ -66,7 +66,7 @@ namespace CamFolUtility {
 	template<typename T>
 	T* GetMember(const void* base, std::ptrdiff_t offset) {
 		auto address = std::uintptr_t(base) + offset;
-		auto reloc = REL::Relocation<T*>(address);
+		REL::Relocation<T*> reloc{ address };
 		return reloc.get();
 	}
 
@@ -104,17 +104,19 @@ namespace CamFolUtility {
 	}
 
 	bool ProcessConditions(RE::PlayerCamera* camera, std::uint32_t* controls, RE::UI* userInterface, RE::PlayerCharacter* player, RE::VATS* vats) {
-		if (ProcessEnabled) {
-			bool a = IsInFirstPerson(camera);
-			bool b = !camera->IsInFreeCameraMode();
-			bool c = (*controls & (std::uint32_t)RE::ControlMap::UEFlag::kMovement);
-			bool d = !userInterface->IsMenuOpen(RE::MapMenu::MENU_NAME);
-			bool e = !player->GetOccupiedFurniture().get().get();
-			bool f = !player->IsInKillMove();
-			bool g = (vats->mode != RE::VATS::VATS_MODE::kKillCam);
-			return (a && b && c && d && e && f && g);
-		}
-		return false;
+		#define REQ(COND) if (bool temp = COND; !temp) return false
+		#define BAN(COND) if (bool temp = COND; temp) return false
+		REQ(ProcessEnabled);
+		REQ(IsInFirstPerson(camera));
+		BAN(camera->IsInFreeCameraMode());
+		REQ(*controls & (std::uint32_t)RE::ControlMap::UEFlag::kMovement);
+		BAN(userInterface->IsMenuOpen(RE::MapMenu::MENU_NAME));
+		BAN(player->GetOccupiedFurniture().get().get());
+		BAN(player->IsInKillMove());
+		BAN(vats->mode == RE::VATS::VATS_MODE::kKillCam);
+		#undef REQ
+		#undef BAN
+		return true;
 	}
 
 	void GetAllChildren(RE::NiAVObject* object, std::set<RE::NiAVObject*>& result) {
@@ -164,9 +166,9 @@ namespace CamFolUtility {
 
 	bool UpdateCamera(RE::NiAVObject* object, RE::PlayerCamera* camera, RE::PlayerCharacter* player) {
 		// get camera stuff
-		RE::NiNode* cameraRootNode = camera->cameraRoot.get();
-		RE::NiAVObject* cameraNetImmerse = (cameraRootNode && cameraRootNode->children.size()) ? cameraRootNode->children[0].get() : nullptr;
-		if (std::uint8_t process = object == cameraRootNode ? 1 : object == cameraNetImmerse ? 2 : 0; process) {
+		RE::NiNode* cameraRoot = camera->cameraRoot.get();
+		RE::NiAVObject* cameraObject = (cameraRoot && cameraRoot->children.size()) ? cameraRoot->children[0].get() : nullptr;
+		if (std::uint8_t process = (object == cameraRoot) ? 1 : (object == cameraObject) ? 2 : 0; process) {
 			// this will be reused
 			RE::NiAVObject* tempO = nullptr;
 			// get player stuff
@@ -189,11 +191,11 @@ namespace CamFolUtility {
 					// push translate vectors
 					switch (process) {
 						case 1:
-							cameraRootNode->world.translate = vApply;
-							cameraRootNode->local.translate = vApply;
+							cameraRoot->world.translate = vApply;
+							cameraRoot->local.translate = vApply;
 							return true;
 						case 2:
-							cameraNetImmerse->world.translate = vApply;
+							cameraObject->world.translate = vApply;
 							return true;
 					}
 				}

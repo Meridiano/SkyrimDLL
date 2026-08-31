@@ -1,5 +1,5 @@
-#include "hpp/Data.hpp"
-#include "hpp/Hooks.hpp"
+#include "hpp/data.hpp"
+#include "hpp/hooks.hpp"
 
 namespace CCUtility {
 

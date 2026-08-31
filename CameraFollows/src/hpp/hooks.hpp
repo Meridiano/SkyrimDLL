@@ -38,9 +38,8 @@ namespace CamFolHooks {
 		// set pointers
 		pCamera = RE::PlayerCamera::GetSingleton();
 
-		auto module = &REL::Module::get();
-		bool post1130 = module && module->IsAE() && (module->version().patch() > 0x400);
-		pControls = CamFolUtility::GetMember<std::uint32_t>(RE::ControlMap::GetSingleton(), post1130 ? 0x120 : 0x118);
+		bool newest = MODULE.IsAE() && (MODULE.version().minor() >= 7 || MODULE.version().patch() >= 1130);
+		pControls = CamFolUtility::GetMember<std::uint32_t>(RE::ControlMap::GetSingleton(), newest ? 0x120 : 0x118);
 
 		pUserInterface = RE::UI::GetSingleton();
 		pPlayer = RE::PlayerCharacter::GetSingleton();
@@ -48,9 +47,9 @@ namespace CamFolHooks {
 
 		// log pointers
 		logs::info(
-			"Camera = {:X}, Controls = {:X} (Post-1130 {}), UserInterface = {:X}, Player = {:X}, VATS = {:X}",
+			"Camera = {:X}, Controls = {:X} (Offset {}), UserInterface = {:X}, Player = {:X}, VATS = {:X}",
 			(std::uint64_t)pCamera,
-			(std::uint64_t)pControls, post1130 ? "Enabled" : "Disabled",
+			(std::uint64_t)pControls, newest ? "V2" : "V1",
 			(std::uint64_t)pUserInterface,
 			(std::uint64_t)pPlayer,
 			(std::uint64_t)pVATS

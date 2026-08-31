@@ -7,7 +7,7 @@ add_requires("xbyak")
 
 -- set project
 set_project("GetIniConsoleFix")
-set_version("1.1.0")
+set_version("1.1.1")
 set_license("GPL-3.0")
 
 -- set defaults

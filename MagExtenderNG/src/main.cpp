@@ -167,7 +167,7 @@ namespace MENGUtility {
 		"MagickaRateMod",
 		"GrabActorOffset",
 		"Grabbed",
-		"AVIF162", //DEPRECATED
+		"DEPRECATED05",
 		"ReflectDamage"
 	};
 
@@ -221,11 +221,10 @@ namespace MENGUtility {
 		"VampireLord"
 	};
 
-	int32_t GetIndex(std::vector<std::string> vec, std::string val)
-	{
+	int32_t GetIndex(std::vector<std::string> vec, std::string val) {
 		auto it = std::find(vec.begin(), vec.end(), val);
 		if (it != vec.end()) {
-			return (int32_t)(it - vec.begin());
+			return (int32_t)std::distance(vec.begin(), it);
 		}
 		return -1;
 	}
@@ -241,33 +240,30 @@ namespace MENGInternal {
 		if (theEffect) {
 			std::string result = "";
 			switch (option) {
-			case 1: { //GetMGEFPrimaryAV
-				using AV = RE::ActorValue;
-				auto primAV = theEffect->data.primaryAV;
-				if (primAV != AV::kNone) {
-					auto index = static_cast<std::underlying_type_t<AV>>(primAV);
-					result = MENGUtility::IndexedAVs[index];
-				}
-				break;
-			}
-			case 2: { //GetMGEFSecondaryAV
-				using AV = RE::ActorValue;
-				auto secAV = theEffect->data.secondaryAV;
-				if (secAV != AV::kNone) {
-					auto index = static_cast<std::underlying_type_t<AV>>(secAV);
-					result = MENGUtility::IndexedAVs[index];
-				}
-				break;
-			}
-			case 3: { //GetMGEFArchetype
-				using AID = RE::EffectArchetypes::ArchetypeID;
-				auto arch = theEffect->data.archetype;
-				if (arch != AID::kNone) {
-					auto index = static_cast<std::underlying_type_t<AID>>(arch);
-					result = MENGUtility::IndexedArchetypes[index];
-				}
-				break;
-			}
+				case 1: { // GetMGEFPrimaryAV
+					using AV = RE::ActorValue;
+					auto primAV = theEffect->data.primaryAV;
+					if (primAV != AV::kNone) {
+						auto index = static_cast<std::underlying_type_t<AV>>(primAV);
+						result = MENGUtility::IndexedAVs[index];
+					}
+				}   break;
+				case 2: { // GetMGEFSecondaryAV
+					using AV = RE::ActorValue;
+					auto secAV = theEffect->data.secondaryAV;
+					if (secAV != AV::kNone) {
+						auto index = static_cast<std::underlying_type_t<AV>>(secAV);
+						result = MENGUtility::IndexedAVs[index];
+					}
+				}   break;
+				case 3: { // GetMGEFArchetype
+					using AID = RE::EffectArchetypes::ArchetypeID;
+					auto arch = theEffect->data.archetype;
+					if (arch != AID::kNone) {
+						auto index = static_cast<std::underlying_type_t<AID>>(arch);
+						result = MENGUtility::IndexedArchetypes[index];
+					}
+				}   break;
 			}
 			return result;
 		}
@@ -278,14 +274,13 @@ namespace MENGInternal {
 		if (theEffect) {
 			int32_t result = -1;
 			switch (option) {
-			case 1: { //GetMGEFArchetypeNum
-				using AID = RE::EffectArchetypes::ArchetypeID;
-				auto arch = theEffect->data.archetype;
-				if (arch != AID::kNone) {
-					result = static_cast<std::underlying_type_t<AID>>(arch);
-				}
-				break;
-			}
+				case 1: { // GetMGEFArchetypeNum
+					using AID = RE::EffectArchetypes::ArchetypeID;
+					auto arch = theEffect->data.archetype;
+					if (arch != AID::kNone) {
+						result = static_cast<std::underlying_type_t<AID>>(arch);
+					}
+				}   break;
 			}
 			return result;
 		}
@@ -296,18 +291,18 @@ namespace MENGInternal {
 		if (theEffect) {
 			float result = 0.0F;
 			switch (option) {
-			case 1: //GetMGEFTaperDuration
-				result = theEffect->data.taperDuration;
-				break;
-			case 2: //GetMGEFTaperWeight
-				result = theEffect->data.taperWeight;
-				break;
-			case 3: //GetMGEFTaperCurve
-				result = theEffect->data.taperCurve;
-				break;
-			case 4: //GetMGEFSecondaryAVWeight
-				result = theEffect->data.secondAVWeight;
-				break;
+				case 1: // GetMGEFTaperDuration
+					result = theEffect->data.taperDuration;
+					break;
+				case 2: // GetMGEFTaperWeight
+					result = theEffect->data.taperWeight;
+					break;
+				case 3: // GetMGEFTaperCurve
+					result = theEffect->data.taperCurve;
+					break;
+				case 4: // GetMGEFSecondaryAVWeight
+					result = theEffect->data.secondAVWeight;
+					break;
 			}
 			return result;
 		}
@@ -318,9 +313,9 @@ namespace MENGInternal {
 		if (theEffect) {
 			RE::TESForm* result = nullptr;
 			switch (option) {
-			case 1: //GetMGEFRelatedForm
-				result = theEffect->data.associatedForm;
-				break;
+				case 1: // GetMGEFRelatedForm
+					result = theEffect->data.associatedForm;
+					break;
 			}
 			return result;
 		}
@@ -330,24 +325,24 @@ namespace MENGInternal {
 	bool MGEFStringSetter(RE::EffectSetting* theEffect, uint8_t option, std::string value) {
 		if (theEffect) {
 			switch (option) {
-			case 1: { //SetMGEFPrimaryAV
-				using AV = RE::ActorValue;
-				auto index = MENGUtility::GetIndex(MENGUtility::IndexedAVs, value);
-				theEffect->data.primaryAV = (index < 0 ? AV::kNone : (AV)index);
-				return true;
-			}
-			case 2: { //SetMGEFSecondaryAV
-				using AV = RE::ActorValue;
-				auto index = MENGUtility::GetIndex(MENGUtility::IndexedAVs, value);
-				theEffect->data.secondaryAV = (index < 0 ? AV::kNone : (AV)index);
-				return true;
-			}
-			case 3: { //SetMGEFArchetype(Native)
-				using AID = RE::EffectArchetypes::ArchetypeID;
-				auto index = MENGUtility::GetIndex(MENGUtility::IndexedArchetypes, value);
-				theEffect->data.archetype = (index < 0 ? AID::kNone : (AID)index);
-				return true;
-			}
+				case 1: { // SetMGEFPrimaryAV
+					using AV = RE::ActorValue;
+					auto index = MENGUtility::GetIndex(MENGUtility::IndexedAVs, value);
+					theEffect->data.primaryAV = (index < 0 ? AV::kNone : (AV)index);
+					return true;
+				}
+				case 2: { // SetMGEFSecondaryAV
+					using AV = RE::ActorValue;
+					auto index = MENGUtility::GetIndex(MENGUtility::IndexedAVs, value);
+					theEffect->data.secondaryAV = (index < 0 ? AV::kNone : (AV)index);
+					return true;
+				}
+				case 3: { // SetMGEFArchetype(Native)
+					using AID = RE::EffectArchetypes::ArchetypeID;
+					auto index = MENGUtility::GetIndex(MENGUtility::IndexedArchetypes, value);
+					theEffect->data.archetype = (index < 0 ? AID::kNone : (AID)index);
+					return true;
+				}
 			}
 			return false;
 		}
@@ -357,18 +352,18 @@ namespace MENGInternal {
 	bool MGEFFloatSetter(RE::EffectSetting* theEffect, uint8_t option, float value) {
 		if (theEffect) {
 			switch (option) {
-			case 1: //SetMGEFTaperDuration
-				theEffect->data.taperDuration = (value < 0.0F ? 0.0F : value);
-				return true;
-			case 2: //SetMGEFTaperWeight
-				theEffect->data.taperWeight = value;
-				return true;
-			case 3: //SetMGEFTaperCurve
-				theEffect->data.taperCurve = value;
-				return true;
-			case 4: //SetMGEFSecondaryAVWeight
-				theEffect->data.secondAVWeight = value;
-				return true;
+				case 1: // SetMGEFTaperDuration
+					theEffect->data.taperDuration = (value < 0.0F ? 0.0F : value);
+					return true;
+				case 2: // SetMGEFTaperWeight
+					theEffect->data.taperWeight = value;
+					return true;
+				case 3: // SetMGEFTaperCurve
+					theEffect->data.taperCurve = value;
+					return true;
+				case 4: // SetMGEFSecondaryAVWeight
+					theEffect->data.secondAVWeight = value;
+					return true;
 			}
 			return false;
 		}
@@ -378,9 +373,9 @@ namespace MENGInternal {
 	bool MGEFFormSetter(RE::EffectSetting* theEffect, uint8_t option, RE::TESForm* value) {
 		if (theEffect) {
 			switch (option) {
-			case 1: //SetMGEFRelatedForm
-				theEffect->data.associatedForm = value;
-				return true;
+				case 1: // SetMGEFRelatedForm
+					theEffect->data.associatedForm = value;
+					return true;
 			}
 			return false;
 		}
@@ -390,11 +385,12 @@ namespace MENGInternal {
 	bool AMEFloatSetter(RE::ActiveEffect* theEffect, uint8_t option, float value) {
 		if (theEffect) {
 			switch (option) {
-			case 1: //SetActiveEffectDuration
-				theEffect->duration = (value < 0.0F ? 0.0F : value);
-				return true;
-			case 2: //SetActiveEffectMagnitude
-				theEffect->magnitude = (value < 0.0F ? 0.0F : value);
+				case 1: // SetActiveEffectDuration
+					theEffect->duration = (value < 0.0F ? 0.0F : value);
+					return true;
+				case 2: // SetActiveEffectMagnitude
+					theEffect->magnitude = (value < 0.0F ? 0.0F : value);
+					return true;
 			}
 			return false;
 		}
@@ -403,8 +399,8 @@ namespace MENGInternal {
 }
 
 namespace MENGPapyrus {
-	//mgef-links-get
-	//string
+	// mgef-links-get
+	// string
 	std::string GetMGEFPrimaryAV(RE::StaticFunctionTag* base, RE::EffectSetting* theEffect) {
 		reinterpret_cast<std::uint64_t>(base);
 		return MENGInternal::MGEFStringGetter(theEffect, 1);
@@ -417,12 +413,12 @@ namespace MENGPapyrus {
 		reinterpret_cast<std::uint64_t>(base);
 		return MENGInternal::MGEFStringGetter(theEffect, 3);
 	}
-	//int
+	// int
 	int32_t GetMGEFArchetypeNum(RE::StaticFunctionTag* base, RE::EffectSetting* theEffect) {
 		reinterpret_cast<std::uint64_t>(base);
 		return MENGInternal::MGEFIntGetter(theEffect, 1);
 	}
-	//float
+	// float
 	float GetMGEFTaperDuration(RE::StaticFunctionTag* base, RE::EffectSetting* theEffect) {
 		reinterpret_cast<std::uint64_t>(base);
 		return MENGInternal::MGEFFloatGetter(theEffect, 1);
@@ -439,14 +435,14 @@ namespace MENGPapyrus {
 		reinterpret_cast<std::uint64_t>(base);
 		return MENGInternal::MGEFFloatGetter(theEffect, 4);
 	}
-	//form
+	// form
 	RE::TESForm* GetMGEFRelatedForm(RE::StaticFunctionTag* base, RE::EffectSetting* theEffect) {
 		reinterpret_cast<std::uint64_t>(base);
 		return MENGInternal::MGEFFormGetter(theEffect, 1);
 	}
 
-	//mgef-links-set
-	//string
+	// mgef-links-set
+	// string
 	bool SetMGEFPrimaryAV(RE::StaticFunctionTag* base, RE::EffectSetting* theEffect, std::string value) {
 		reinterpret_cast<std::uint64_t>(base);
 		return MENGInternal::MGEFStringSetter(theEffect, 1, value);
@@ -459,7 +455,7 @@ namespace MENGPapyrus {
 		reinterpret_cast<std::uint64_t>(base); 
 		return MENGInternal::MGEFStringSetter(theEffect, 3, value);
 	}
-	//float
+	// float
 	bool SetMGEFTaperDuration(RE::StaticFunctionTag* base, RE::EffectSetting* theEffect, float value) {
 		reinterpret_cast<std::uint64_t>(base); 
 		return MENGInternal::MGEFFloatSetter(theEffect, 1, value);
@@ -476,14 +472,14 @@ namespace MENGPapyrus {
 		reinterpret_cast<std::uint64_t>(base); 
 		return MENGInternal::MGEFFloatSetter(theEffect, 4, value);
 	}
-	//form
+	// form
 	bool SetMGEFRelatedForm(RE::StaticFunctionTag* base, RE::EffectSetting* theEffect, RE::TESForm* value) {
 		reinterpret_cast<std::uint64_t>(base); 
 		return MENGInternal::MGEFFormSetter(theEffect, 1, value);
 	}
 
-	//ame-links-set
-	//float
+	// ame-links-set
+	// float
 	bool SetActiveEffectDuration(RE::StaticFunctionTag* base, RE::ActiveEffect* theEffect, float value) {
 		reinterpret_cast<std::uint64_t>(base); 
 		return MENGInternal::AMEFloatSetter(theEffect, 1, value);
