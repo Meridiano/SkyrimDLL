@@ -6,7 +6,7 @@ includes("lib/commonlibsse-ng")
 
 -- set project
 set_project("PapyrusUtilTFC")
-set_version("1.0.1")
+set_version("1.1.0")
 set_license("GPL-3.0")
 
 -- set defaults
@@ -22,6 +22,7 @@ add_rules("plugin.vsxmake.autoupdate")
 
 -- set configs
 set_config("mode", "releasedbg")
+set_config("rex_ini", true)
 
 -- targets
 target("PapyrusUtilTFC")

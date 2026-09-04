@@ -43,6 +43,14 @@
             },
             version = "v8.92"
         },
+        ["simpleini v4.25#f56260b5"] = {
+            repo = {
+                branch = "master",
+                commit = "d436e4387e114e6b156e37da08fad9caf063668c",
+                url = "https://gitlab.com/tboox/xmake-repo.git"
+            },
+            version = "v4.25"
+        },
         ["spdlog v1.16.0#09c8c173"] = {
             repo = {
                 branch = "master",

@@ -1,86 +1,59 @@
-namespace MiscUtilFixed {
+#include "hpp/config.hpp"
+#include "hpp/papyrus.hpp"
+#include "hpp/utility.hpp"
 
-	void FixInputContext(RE::PlayerCamera* camera) {
-		static auto controls = RE::ControlMap::GetSingleton();
-		if (controls) {
-			auto stateA = camera->currentState.get();
-			auto stateB = camera->GetRuntimeData().cameraStates[3].get();
-			static auto context = RE::ControlMap::InputContextID::kTFCMode;
-			if (stateA == stateB) {
-				controls->PushInputContext(context);
-			} else {
-				controls->PopInputContext(context);
-			}
-		}
-	}
+void InvertedPatch() {
+	std::uint8_t result = 0;
 
-	void SetFreeCameraSpeed(float speed) {
-		static auto collection = RE::INISettingCollection::GetSingleton();
-		if (collection) {
-			static auto setting = collection->GetSetting("fFreeCameraTranslationSpeed:Camera");
-			if (setting) {
-				setting->data.f = speed;
-			}
-		}
-	}
+	// up to 1.6.659 GOG, AE ID is 22911
+	// up to 1.6.659 GOG, offsets are 0xB4 and 0xC0, even in SE and VR
+	// starting from 1.6.1130, AE ID is 441593
+	// starting from 1.6.1130, offsets are 0xC9 and 0xD0
 
-	void ToggleFreeCamera(RE::StaticFunctionTag* base, bool stopTime) {
-		(void)base; // unused
-		logs::info("ToggleFreeCamera:{}", stopTime);
-		static auto camera = RE::PlayerCamera::GetSingleton();
-		if (camera) {
-			camera->ToggleFreeCameraMode(stopTime);
-			FixInputContext(camera);
-		}
-	}
-
-	void SetFreeCameraState(RE::StaticFunctionTag* base, bool enable, float speed) {
-		(void)base; // unused
-		logs::info("SetFreeCameraState:{}:{}", enable, speed);
-		static auto camera = RE::PlayerCamera::GetSingleton();
-		if (camera) {
-			auto cameraState = camera->currentState.get();
-			if (cameraState) {
-				bool freeCamera = cameraState->id == RE::CameraState::kFree;
-				if (freeCamera != enable) {
-					if (enable) SetFreeCameraSpeed(speed);
-					camera->ToggleFreeCameraMode(false);
-					FixInputContext(camera);
-				}
-			}
-		}
-	}
-
+	bool newModule = MODULE.version() > SKSE::RUNTIME_SSE_1_6_659;
+	REL::VariantID id(22436, newModule ? 441593 : 22911, 0x326280);
+	std::size_t value_a = newModule ? 0xC9 : 0xB4;
+	std::size_t value_b = newModule ? 0xD0 : 0xC0;
+	REL::VariantOffset offset_a(value_a, value_a, value_a);
+	REL::VariantOffset offset_b(value_b, value_b, value_b);
+	result += PluginUtility::NopCall(id, offset_a);
+	result += PluginUtility::NopCall(id, offset_b);
+	logs::info("Inverted approach {} result = {} / {}", newModule ? "V2" : "V1", result, 2);
 }
 
-bool PapyrusOverride(RE::BSScript::IVirtualMachine* a_vm) {
-	logs::info("PapyrusOverride:{:X}", (std::uint64_t)a_vm);
-	if (a_vm) {
-		auto className = "MiscUtil";
-		a_vm->RegisterFunction("ToggleFreeCamera", className, MiscUtilFixed::ToggleFreeCamera);
-		a_vm->RegisterFunction("SetFreeCameraState", className, MiscUtilFixed::SetFreeCameraState);
-	}
-	return true;
+void PapyrusPatch() {
+	auto papyrusUtil = FIND_MODULE("PapyrusUtil");
+	if (papyrusUtil) {
+		const auto papInterface = SKSE::GetPapyrusInterface();
+		if (papInterface) papInterface->Register(PapyrusFixed::PapyrusOverride);
+		else SKSE::stl::report_and_fail("Script interface not found");
+	} else SKSE::stl::report_and_fail("PapyrusUtil module not found");
+	logs::info("Papyrus override registered");
 }
 
 void MessageListener(SKSE::MessagingInterface::Message* a_msg) {
-	if (a_msg->type == SKSE::MessagingInterface::kPostPostLoad) {
-		auto papyrusUtil = FindModule(L"PapyrusUtil");
-		if (papyrusUtil) {
-			const auto papInterface = SKSE::GetPapyrusInterface();
-			if (papInterface) papInterface->Register(PapyrusOverride);
-			else SKSE::stl::report_and_fail("Script interface not found");
-		} else SKSE::stl::report_and_fail("PapyrusUtil module not found");
+	switch (a_msg->type) {
+		case SKSE::MessagingInterface::kPostLoad:
+			if (PluginConfig::bInvertedApproach.value) InvertedPatch();
+			break;
+		case SKSE::MessagingInterface::kPostPostLoad:
+			if (PluginConfig::bInvertedApproach.value) {
+				logs::info("Inverted approach is used, Papyrus patch disabled");
+				break;
+			}
+			PapyrusPatch();
+			break;
 	}
 }
 
 SKSEPluginLoad(const SKSE::LoadInterface* a_skse) {
 	SKSE::Init(a_skse, true);
 
-	auto module = &REL::Module::get();
-	auto moduleName = fs::path(module->filename()).replace_extension("").string();
-	auto moduleVersion = module->version().string("-");
+	auto moduleName = fs::path(MODULE.filename()).replace_extension("").string();
+	auto moduleVersion = MODULE.version().string("-");
 	logs::info("{} v{}", moduleName, moduleVersion);
+
+	PluginConfig::ReadConfig();
 
 	const auto msgInterface = SKSE::GetMessagingInterface();
 	return (msgInterface ? msgInterface->RegisterListener(MessageListener) : false);
