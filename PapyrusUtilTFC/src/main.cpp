@@ -12,10 +12,10 @@ void InvertedPatch() {
 
 	bool newModule = MODULE.version() > SKSE::RUNTIME_SSE_1_6_659;
 	REL::VariantID id(22436, newModule ? 441593 : 22911, 0x326280);
-	std::size_t value_a = newModule ? 0xC9 : 0xB4;
-	std::size_t value_b = newModule ? 0xD0 : 0xC0;
-	REL::VariantOffset offset_a(value_a, value_a, value_a);
-	REL::VariantOffset offset_b(value_b, value_b, value_b);
+	std::size_t value_a = 0xB4;
+	std::size_t value_b = 0xC0;
+	REL::VariantOffset offset_a(value_a, newModule ? 0xC9 : value_a, value_a);
+	REL::VariantOffset offset_b(value_b, newModule ? 0xD0 : value_b, value_b);
 	result += PluginUtility::NopCall(id, offset_a);
 	result += PluginUtility::NopCall(id, offset_b);
 	logs::info("Inverted approach {} result = {} / {}", newModule ? "V2" : "V1", result, 2);
