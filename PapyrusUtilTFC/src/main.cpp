@@ -10,7 +10,7 @@ void InvertedPatch() {
 	// starting from 1.6.1130, AE ID is 441593
 	// starting from 1.6.1130, offsets are 0xC9 and 0xD0
 
-	bool newModule = MODULE.version() > SKSE::RUNTIME_SSE_1_6_659;
+	bool newModule = MODULE.version() > REL::Version(1, 6, 659, 0);
 	REL::VariantID id(22436, newModule ? 441593 : 22911, 0x326280);
 	std::size_t value_a = 0xB4;
 	std::size_t value_b = 0xC0;
