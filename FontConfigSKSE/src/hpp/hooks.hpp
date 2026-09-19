@@ -56,11 +56,11 @@ namespace FCHooks {
 					static REL::Relocation targetD{ id, REL::Offset(offsets[3]) };
 					static REL::Relocation targetE{ id, REL::Offset(offsets[4]) };
 					// check
-					if (!SignMatch(targetA, "E8")) FatalError("{}:{} target is invalid", name, offsets[0]);
-					if (!SignMatch(targetB, "E8")) FatalError("{}:{} target is invalid", name, offsets[1]);
-					if (!SignMatch(targetC, "E8")) FatalError("{}:{} target is invalid", name, offsets[2]);
-					if (!SignMatch(targetD, "E8")) FatalError("{}:{} target is invalid", name, offsets[3]);
-					if (!SignMatch(targetE, "E8")) FatalError("{}:{} target is invalid", name, offsets[4]);
+					if (!SignMatch(targetA, "E8")) FatalError("{}:{:X} target is invalid", name, offsets[0]);
+					if (!SignMatch(targetB, "E8")) FatalError("{}:{:X} target is invalid", name, offsets[1]);
+					if (!SignMatch(targetC, "E8")) FatalError("{}:{:X} target is invalid", name, offsets[2]);
+					if (!SignMatch(targetD, "E8")) FatalError("{}:{:X} target is invalid", name, offsets[3]);
+					if (!SignMatch(targetE, "E8")) FatalError("{}:{:X} target is invalid", name, offsets[4]);
 					// install
 					Call<0>::OLD = targetA.write_call<5>(Call<0>::NEW);
 					Call<1>::OLD = targetB.write_call<5>(Call<1>::NEW);
@@ -86,8 +86,8 @@ namespace FCHooks {
 	private:
 		static inline std::string name{ "02752D51" };
 		struct Call {
-			static std::uintptr_t NEW(std::uintptr_t* map, RE::GString* str) {
-				auto result = OLD(map, str);
+			static RE::GString* NEW(FCData::FontMapData** mapHolder, RE::GString* str) {
+				auto result = OLD(mapHolder, str);
 				if (str && result) {
 					auto data = str->data();
 					logs::info("{} duplication of {} in address {:X}", name, FCUtility::Quoted(data ? data : ""), (std::uint64_t)result);
