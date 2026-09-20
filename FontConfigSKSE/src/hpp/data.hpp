@@ -49,6 +49,7 @@ namespace FCData {
 			}
 		}
 	};
+	static_assert(sizeof(GFxFontMap) == 0x20);
 
 	std::string fontConfig{};
 	REL::Version gameVersion{};
