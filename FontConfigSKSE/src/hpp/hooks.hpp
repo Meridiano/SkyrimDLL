@@ -91,7 +91,7 @@ namespace FCHooks {
 				if (str && result) {
 					auto data = str->data();
 					logs::info("{} duplication of {} in address {:X}", name, FCUtility::Quoted(data ? data : ""), (std::uint64_t)result);
-					result = 0;
+					result = nullptr;
 				}
 				return result;
 			}
