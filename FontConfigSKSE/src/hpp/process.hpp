@@ -22,6 +22,32 @@ namespace FCProcess {
 		}
 	}
 
+	void ApplyFontScale(FCData::FontMapData** mapHolder) {
+		if (mapHolder) if (auto map = *mapHolder; map) {
+			logs::info("Map address = {:X}", (std::uint64_t)map);
+			std::uint64_t index = 0;
+			std::span<FCData::FontMapEntry> span{ &map->firstEntry, map->maxIndex + 1 };
+			for (auto& entry : span) if (entry.flags != -2) {
+				auto keyData = entry.key.data();
+				auto tagData = entry.tag.data();
+				if (keyData && tagData) {
+					bool scaleChange = false;
+					float oldScale = entry.scale;
+					static auto mapEnd = FCConfig::fontScaleMap.end();
+					if (auto mapEntry = FCConfig::fontScaleMap.find(keyData); mapEntry != mapEnd) {
+						entry.scale = mapEntry->second;
+						scaleChange = true;
+					}
+					logs::info(
+						"Entry #{} / {} = {} / Scale {} {}",
+						index++, FCUtility::Quoted(keyData), FCUtility::Quoted(tagData),
+						scaleChange ? std::format("changed from {} to", oldScale) : "is", entry.scale
+					);
+				}
+			}
+		}
+	}
+
 	void ExtendedProcess(RE::BSScaleformManager* scaleform, REL::Relocation<void(*)(RE::BSScaleformManager*)> function) {
 		// save original - valid
 		FCData::validNameChars = scaleform->validNameChars.data();
@@ -43,11 +69,11 @@ namespace FCProcess {
 				}
 			}
 		}
-		// final fixup
+		// final tweaks
 		fontConfig->data.s = FCData::fontConfig.data();
 		scaleform->validNameChars = FCData::validNameChars;
 		logs::info("New valid chars size = {}", scaleform->validNameChars.size());
-		if (FCData::fontMap) FCData::fontMap->LogEntries();
+		if (FCData::fontMap) ApplyFontScale(FCData::fontMap->mapHolder);
 	}
 
 }

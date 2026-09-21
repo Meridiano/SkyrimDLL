@@ -1,5 +1,5 @@
 #pragma once
-#include "hpp/utility.hpp"
+#include "hpp/config.hpp"
 
 namespace FCData {
 
@@ -16,7 +16,7 @@ namespace FCData {
 		std::uint64_t index;
 		RE::GString key;
 		RE::GString tag;
-		float special;
+		float scale;
 		std::int32_t unusedA;
 		std::int32_t unusedB;
 		FontType type;
@@ -30,24 +30,12 @@ namespace FCData {
 	};
 	static_assert(sizeof(FontMapData) == 0x40);
 
-	class GFxFontMap {
-		virtual ~GFxFontMap() = 0;
-		// members
-		std::byte unkownData[16];
-		FontMapData** mapHolder;
+	class GFxFontMap : public RE::GFxState {
 	public:
-		void LogEntries() {
-			if (mapHolder) if (auto map = *mapHolder; map) {
-				logs::info("Map address = {:X}", (std::uint64_t)map);
-				std::uint64_t index = 0;
-				std::span<FontMapEntry> span{ &map->firstEntry, map->maxIndex + 1 };
-				for (auto& entry : span) if (entry.flags != -2) {
-					auto keyData = entry.key.data();
-					auto tagData = entry.tag.data();
-					if (keyData && tagData) logs::info("Entry #{} / {} = {}", index++, FCUtility::Quoted(keyData), FCUtility::Quoted(tagData));
-				}
-			}
-		}
+		// override
+		virtual ~GFxFontMap();
+		// members
+		FontMapData** mapHolder;
 	};
 	static_assert(sizeof(GFxFontMap) == 0x20);
 

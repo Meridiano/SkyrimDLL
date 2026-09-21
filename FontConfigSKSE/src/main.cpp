@@ -10,6 +10,7 @@ SKSE_PLUGIN_LOAD(const SKSE::LoadInterface* a_skse) {
 	FCData::gameVersion = a_skse->RuntimeVersion();
 	auto gameName = std::filesystem::path(MODULE.filePath()).filename().replace_extension("");
 	logs::info("{} v{}", gameName.string(), FCData::gameVersion.string("-"));
+	FCConfig::ParseConfigList();
 	FCHooks::InstallAll();
 	return true;
 }

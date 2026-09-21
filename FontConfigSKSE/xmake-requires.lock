@@ -27,6 +27,9 @@
             },
             version = "24.2.0"
         },
+        ["glaze_8 v8.4.0#f56260b5"] = {
+            version = "v8.4.0"
+        },
         ["ninja#f56260b5"] = {
             repo = {
                 branch = "master",

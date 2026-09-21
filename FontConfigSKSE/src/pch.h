@@ -6,6 +6,8 @@
 namespace logs = SKSE::log;
 using namespace std::literals;
 
+#include "glaze/json.hpp"
+
 #define MODULE REL::Module::get()
 #define SignMatch(LOC,SIG) REL::make_pattern<SIG>().match(LOC.address())
 #define FatalError(...) SKSE::stl::report_and_fail(std::format(__VA_ARGS__))
