@@ -37,7 +37,7 @@ namespace FCHooks {
 			static bool NEW(FCData::GFxFontMap* map, char* key, char* tag, FCData::FontType type, float scale, std::int32_t unusedA, std::int32_t unusedB) {
 				auto info = std::format("{} input = {} + {} + {}", name, FCUtility::Quoted(key), FCUtility::Quoted(tag), (std::uint32_t)type);
 				bool result = OLD(map, key, tag, type, scale, unusedA, unusedB);
-				logs::info("{} / result = {:X}", info, result);
+				logs::info("{} / Result = {:X}", info, result);
 				FCData::fontMap = map;
 				return result;
 			}

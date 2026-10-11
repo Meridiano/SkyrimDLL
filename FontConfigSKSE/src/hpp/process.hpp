@@ -5,20 +5,10 @@ namespace FCProcess {
 
 	void AdjustChars(RE::BSScaleformManager* scaleform) {
 		auto oldChars = FCUtility::Dequoted(FCData::validNameChars);
-		if (auto oldCharsWide = SKSE::stl::utf8_to_utf16(oldChars); oldCharsWide.has_value()) {
-			auto newChars = FCUtility::Dequoted(scaleform->validNameChars.data());
-			if (auto newCharsWide = SKSE::stl::utf8_to_utf16(newChars); newCharsWide.has_value()) {
-				auto modifiedWide = [](std::wstring left, std::wstring right) {
-					std::wstring result = left;
-					for (wchar_t wc : right)
-						if (result.find(wc) == std::wstring::npos)
-							result += wc;
-					return result;
-				}(oldCharsWide.value(), newCharsWide.value());
-				if (auto modified = SKSE::stl::utf16_to_utf8(modifiedWide); modified.has_value()) {
-					FCData::validNameChars = FCUtility::Quoted(modified.value());
-				}
-			}
+		auto newChars = FCUtility::Dequoted(scaleform->validNameChars.data());
+		if (oldChars != newChars) {
+			newChars = FCUtility::Quoted(oldChars + newChars);
+			FCData::validNameChars = scaleform->validNameChars = newChars.data();
 		}
 	}
 
@@ -48,9 +38,10 @@ namespace FCProcess {
 		}
 	}
 
-	void ExtendedProcess(RE::BSScaleformManager* scaleform, REL::Relocation<void(*)(RE::BSScaleformManager*)> function) {
+	template <typename T>
+	void ExtendedProcess(RE::BSScaleformManager* scaleform, REL::Relocation<T> function) {
 		// save original - valid
-		FCData::validNameChars = scaleform->validNameChars.data();
+		FCData::validNameChars = scaleform->validNameChars;
 		logs::info("Original valid chars size = {}", FCData::validNameChars.size());
 		// save original - config
 		auto fontConfig = FCUtility::GetFontConfig();
@@ -71,7 +62,6 @@ namespace FCProcess {
 		}
 		// final tweaks
 		fontConfig->data.s = FCData::fontConfig.data();
-		scaleform->validNameChars = FCData::validNameChars;
 		logs::info("New valid chars size = {}", scaleform->validNameChars.size());
 		if (FCData::fontMap) ApplyFontScale(FCData::fontMap->mapHolder);
 	}

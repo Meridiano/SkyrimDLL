@@ -44,11 +44,11 @@ namespace FCUtility {
 		auto cmp = entry.path().extension().wstring();
 		return (wcsicmp(cmp.data(), ext) == 0);
 	}
-	
+
 	struct CaseInsensitiveHash {
 		std::size_t operator()(const std::string& s) const noexcept {
 			auto low = SKSE::stl::utf8_to_utf16(s).value_or(L"");
-			for (auto& wch : low) { wch = std::towlower(wch); }
+			for (auto& wch : low) wch = std::towlower(wch);
 			static std::hash<std::wstring> hasher;
 			return hasher(low);
 		}
